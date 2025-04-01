@@ -1,0 +1,186 @@
+@import "/node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+}
+.display-flex {
+  display: flex;
+  width: 100vw; /* Garante que ocupe toda a largura da tela */
+  height: 100vh; /*Mantém a altura da tela inteira */
+}
+.main-content {
+  margin-left: 250px;
+  margin-top: -10px; /* Deixa espaço para a sidebar */
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  background-color: #ffffff;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  height: 100vh;
+  position: fixed; /* Fixa a sidebar na esquerda */
+  left: 0;
+  top: 0;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.sidebar a:hover {
+  background-color: #f1f1f1;
+}
+
+.sidebar a.active {
+  background-color: #7b61ff;
+  color: #ffffff;
+}
+
+.sidebar a i {
+  margin-right: 10px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header .welcome {
+  font-size: 18px;
+  color: #6c757d;
+}
+
+.header .icons {
+  display: flex;
+  align-items: center;
+}
+
+.header .icons i {
+  font-size: 20px;
+  color: #6c757d;
+  margin-right: 20px;
+}
+
+.header .icons .user {
+  display: flex;
+  align-items: center;
+}
+
+.header .icons .user i {
+  font-size: 30px;
+  color: #6c757d;
+  margin-right: 10px;
+}
+
+.info-cards {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.info-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 30%;
+  text-align: center;
+}
+
+.info-card h3 {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.info-card p {
+  font-size: 24px;
+  color: #7b61ff;
+  margin: 0;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section h2 {
+  font-size: 18px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.cards {
+  display: flex; /* Enables flexbox for horizontal arrangement */
+  gap: 20px; /* Adds spacing between cards */
+  flex-wrap: wrap; /* Allows cards to wrap onto multiple lines if needed */
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: calc(33.33% - 20px); /* Adjust width for spacing */
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+.card h3 {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.card .tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.card .tag.event {
+  background-color: #7b61ff;
+}
+
+.card .tag.comunicado {
+  background-color: #ff6161;
+}
+
+.card p {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.card a {
+  font-size: 14px;
+  color: #7b61ff;
+  text-decoration: none;
+}
+
+.view-all {
+  text-align: right;
+  font-size: 14px;
+  color: #7b61ff;
+  text-decoration: none;
+}
