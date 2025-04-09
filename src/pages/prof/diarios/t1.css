@@ -223,3 +223,53 @@ body {
     width: 100%;
   }
 }
+
+.form-container {
+  background-color: #fdfdfd;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group select,
+.datepicker {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.alunos-section {
+  margin-top: 20px;
+}
+
+.aluno-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ecf0f1;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.presenca-options label {
+  margin-left: 15px;
+  font-weight: 500;
+}
+
+.presenca-options input {
+  margin-right: 5px;
+}

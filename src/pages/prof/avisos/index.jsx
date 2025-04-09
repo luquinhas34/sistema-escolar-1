@@ -17,7 +17,7 @@ function Profaviso() {
     });
 
     api.interceptors.request.use((config) => {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("token");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -42,7 +42,7 @@ function Profaviso() {
 
     // Adicionar novo aviso
     const handleAddAviso = async () => {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("token");
 
         // Verificar se o token existe antes de realizar a requisição
         if (!token) {
@@ -76,7 +76,7 @@ function Profaviso() {
 
     // Excluir um aviso
     const handleDeleteAviso = async (id) => {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("token");
 
         if (!token) {
             alert("Você precisa estar logado para excluir um aviso.");
@@ -125,7 +125,7 @@ function Profaviso() {
                 <Link to="/prof/avisos" className="active">
                     <i className="fas fa-bell"></i> AVISOS
                 </Link>
-                <Link to="/sair">
+                <Link to="/">
                     <i className="fas fa-sign-out-alt"></i> SAIR
                 </Link>
             </div>

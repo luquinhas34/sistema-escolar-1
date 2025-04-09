@@ -223,9 +223,9 @@ const DiarioDePresenca = () => {
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <label>
-                        Selecionar Turma:
+                <form onSubmit={handleSubmit} className="form-container">
+                    <div className="form-group">
+                        <label>Selecionar Turma:</label>
                         <select value={selectedTurma} onChange={handleTurmaChange} required>
                             <option value="">Selecione uma turma</option>
                             {turmas.map((turma) => (
@@ -234,53 +234,57 @@ const DiarioDePresenca = () => {
                                 </option>
                             ))}
                         </select>
-                    </label>
+                    </div>
 
-                    <label>
-                        Selecionar Data:
+                    <div className="form-group">
+                        <label>Selecionar Data:</label>
                         <DatePicker
                             selected={dataSelecionada}
                             onChange={setDataSelecionada}
                             dateFormat="dd/MM/yyyy"
+                            className="datepicker"
                         />
-                    </label>
+                    </div>
 
                     {alunos.length > 0 && (
-                        <div>
+                        <div className="alunos-section">
                             <h3>Alunos da Turma:</h3>
                             {alunos.map((aluno) => {
                                 const presenca = presencas.find((p) => p.alunoId === aluno.id);
                                 return (
-                                    <div key={aluno.id} style={{ marginBottom: "10px" }}>
-                                        <strong>{aluno.nome}:</strong>
-                                        <label style={{ marginLeft: "10px" }}>
-                                            Presença:
-                                            <input
-                                                type="radio"
-                                                name={`presenca-${aluno.id}`}
-                                                value="presenca"
-                                                checked={presenca?.status === "presenca"}
-                                                onChange={() => handlePresencaChange(aluno.id, "presenca")}
-                                            />
-                                        </label>
-                                        <label style={{ marginLeft: "10px" }}>
-                                            Falta:
-                                            <input
-                                                type="radio"
-                                                name={`presenca-${aluno.id}`}
-                                                value="falta"
-                                                checked={presenca?.status === "falta"}
-                                                onChange={() => handlePresencaChange(aluno.id, "falta")}
-                                            />
-                                        </label>
+                                    <div key={aluno.id} className="aluno-card">
+                                        <span>{aluno.nome}</span>
+                                        <div className="presenca-options">
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name={`presenca-${aluno.id}`}
+                                                    value="presenca"
+                                                    checked={presenca?.status === "presenca"}
+                                                    onChange={() => handlePresencaChange(aluno.id, "presenca")}
+                                                />
+                                                Presente
+                                            </label>
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name={`presenca-${aluno.id}`}
+                                                    value="falta"
+                                                    checked={presenca?.status === "falta"}
+                                                    onChange={() => handlePresencaChange(aluno.id, "falta")}
+                                                />
+                                                Falta
+                                            </label>
+                                        </div>
                                     </div>
                                 );
                             })}
                         </div>
                     )}
 
-                    <button type="submit">Registrar Presença</button>
+                    <button type="submit" className="submit-button">Registrar Presença</button>
                 </form>
+
 
 
 

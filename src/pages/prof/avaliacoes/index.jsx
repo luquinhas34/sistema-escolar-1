@@ -1,187 +1,218 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom"; // Alterado a importação de Link
 import api from "../../../services/api";
-import "../avaliacoes/avaliacoes.css";
+import "../atividades/index.css";
+import axios from "axios";
+
 
 function ProfAvaliacoes() {
-  const [loading, setLoading] = useState(true);
-  const [avaliacoes, setAvaliacoes] = useState([]);
-  const [novaAvaliacao, setNovaAvaliacao] = useState({
+  const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
-    turma: "",
     dataInicio: "",
     dataFim: "",
+    turmaId: "",
+    userId: "",
     documento: null,
   });
-  const [erro, setErro] = useState("");
-  const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState(null);
-  const [mensagem, setMensagem] = useState("");
+
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [avaliacoes, setAvaliacoes] = useState([]);
+  const [avaliacoesParaEditar, setAvaliacoesParaEditar] = useState(null);
+  const [mensagem, setMensagem] = useState("");
+  const [erro, setErro] = useState("");
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
-  const [avaliacaoIdParaExcluir, setAvaliacaoIdParaExcluir] = useState(null);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Usuário não autenticado!");
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        const resUser = await api.get("/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(resUser.data);
-
-        const resAvaliacoes = await api.get("/api/avaliacoes", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAvaliacoes(resAvaliacoes.data || []);
-        setLoading(false);
-      } catch (error) {
-        console.error("Erro ao buscar dados", error);
-        setErro("Erro ao buscar dados.");
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []); // Executa apenas uma vez, quando o componente for montado
+  const [idParaExcluir, setIdParaExcluir] = useState(null);
+  const [user, setUser] = useState({ name: "Usuário" });
+  const [turmas, setTurmas] = useState([]);
+  const [selectedTurma, setSelectedTurma] = useState("");
 
   const handleInputChange = (e) => {
-    setNovaAvaliacao((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-      documento: e.target.name === "documento" ? e.target.files[0] : prev.documento,
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
     }));
   };
 
   const handleFileChange = (e) => {
-    setNovaAvaliacao({ ...novaAvaliacao, documento: e.target.files[0] });
+    setFormData({ ...formData, documento: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    if (!novaAvaliacao.titulo || !novaAvaliacao.descricao || !novaAvaliacao.turma || !novaAvaliacao.dataInicio || !novaAvaliacao.dataFim) {
-      setErro("Preencha todos os campos.");
+    console.log("Dados a serem enviados:", formData);
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    if (!formData.titulo || !formData.descricao || !formData.dataInicio ||
+      !formData.dataFim || !formData.turmaId || !formData.userId) {
+      setErro("Todos os campos são obrigatórios.");
       return;
     }
 
-    if (new Date(novaAvaliacao.dataInicio) > new Date(novaAvaliacao.dataFim)) {
-      setErro("A data de início deve ser anterior à data de fim.");
-      return;
-    }
+    const data = new FormData();
 
-    const formData = new FormData();
-    Object.keys(novaAvaliacao).forEach((key) => {
-      if (novaAvaliacao[key]) {
-        formData.append(key, novaAvaliacao[key]);
-      }
-    });
+    // Adicionar cada campo ao FormData
+    data.append("titulo", formData.titulo);
+    data.append("descricao", formData.descricao);
+    data.append("dataInicio", formData.dataInicio);
+    data.append("dataFim", formData.dataFim);
+    data.append("turmaId", formData.turmaId);
+    data.append("userId", formData.userId);
+
+    // Adicionar documento apenas se existir
+    if (formData.documento) {
+      data.append("documento", formData.documento);
+    }
 
     try {
-      let res;
-      if (avaliacaoParaEditar) {
-        res = await api.patch(`/api/avaliacoes/${avaliacaoParaEditar.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        setMensagem("Avaliação atualizada com sucesso!");
-      } else {
-        res = await api.post("/api/avaliacoes", formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        setMensagem("Avaliação criada com sucesso!");
-      }
+      const token = localStorage.getItem("token");
 
-      setAvaliacoes((prev) =>
-        avaliacaoParaEditar ? prev.map((a) => (a.id === avaliacaoParaEditar.id ? res.data : a)) : [...prev, res.data]
-      );
+      // Usar a API configurada em vez de axios diretamente para manter consistência
+      const response = await api.post("/api/avaliacoes", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      setNovaAvaliacao({ titulo: "", descricao: "", turma: "", dataInicio: "", dataFim: "", documento: null });
-      setAvaliacaoParaEditar(null);
+      setMensagem(response.data.message || "Avaliação criada com sucesso!");
+      setErro("");
+      setFormData({
+        titulo: "",
+        descricao: "",
+        dataInicio: "",
+        dataFim: "",
+        turmaId: "",
+        userId: "",
+        documento: null,
+      });
+      setSelectedTurma("");
       setMostrarFormulario(false);
-      setTimeout(() => setMensagem(""), 3000);
+      buscarAvaliacoes();
     } catch (error) {
-      console.error("Erro ao adicionar/editar avaliação", error.response || error);
-      setErro(error.response?.data?.message || "Erro ao adicionar/editar avaliação.");
-      setTimeout(() => setErro(""), 3000);
+      console.error("Erro ao criar avaliação:", error);
+      // Exibir mensagem mais detalhada do erro
+      if (error.response && error.response.data && error.response.data.message) {
+        setErro(`Erro: ${error.response.data.message}`);
+      } else {
+        setErro("Erro ao criar avaliação. Verifique se todos os campos estão preenchidos corretamente.");
+      }
     }
   };
 
-  const handleRemoverAvaliacao = (id) => {
-    setAvaliacaoIdParaExcluir(id);
+  // Renomeada para manter consistência
+  const buscarAvaliacoes = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await api.get("/api/avaliacoes", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAvaliacoes(response.data);
+    } catch (error) {
+      console.error('Erro ao criar avaliação:', error);
+      console.log('Resposta do servidor:', error.response?.data);
+    }
+  };
+
+  const handleEditaravaliacoes = (avaliacao) => {
+    setAvaliacoesParaEditar(avaliacao);
+    // Formatando as datas para o formato esperado pelo input datetime-local
+    const dataInicio = avaliacao.dataInicio ? new Date(avaliacao.dataInicio).toISOString().slice(0, 16) : "";
+    const dataFim = avaliacao.dataFim ? new Date(avaliacao.dataFim).toISOString().slice(0, 16) : "";
+
+    setFormData({
+      ...avaliacao,
+      dataInicio,
+      dataFim,
+      documento: null,
+    });
+    setSelectedTurma(avaliacao.turmaId);
+    setMostrarFormulario(true);
+  };
+
+  const handleRemoveravaliacoes = (id) => {
+    setIdParaExcluir(id);
     setMostrarModalExcluir(true);
   };
 
   const confirmarExclusao = async () => {
-    const token = localStorage.getItem("token");
-
     try {
-      await api.delete(`/api/avaliacoes/${avaliacaoIdParaExcluir}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem("token");
+      await api.delete(`/api/avaliacoes/${idParaExcluir}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      setAvaliacoes((prev) => prev.filter((avaliacao) => avaliacao.id !== avaliacaoIdParaExcluir));
-      setMensagem("Avaliação removida com sucesso!");
-      setTimeout(() => setMensagem(""), 3000);
-      setMostrarModalExcluir(false);
+      setMensagem("Avaliação excluída com sucesso!");
+      setErro("");
+      buscarAvaliacoes();
     } catch (error) {
-      console.error("Erro ao remover avaliação", error.response || error);
-      setErro(error.response?.data?.message || "Erro ao remover avaliação.");
-      setTimeout(() => setErro(""), 3000);
+      console.error("Erro ao excluir avaliações:", error);
+      setErro("Erro ao excluir avaliações.");
+    } finally {
       setMostrarModalExcluir(false);
+      setIdParaExcluir(null);
     }
   };
 
   const cancelarExclusao = () => {
     setMostrarModalExcluir(false);
+    setIdParaExcluir(null);
   };
 
-  const handleEditavaliacao = (avaliacao) => {
-    setAvaliacaoParaEditar(avaliacao);
-    setNovaAvaliacao({
-      titulo: avaliacao.titulo,
-      descricao: avaliacao.descricao,
-      turma: avaliacao.turma,
-      dataInicio: avaliacao.dataInicio,
-      dataFim: avaliacao.dataFim,
-      documento: avaliacao.documento,
-    });
-    setMostrarFormulario(true);
+  useEffect(() => {
+    const buscarTurmas = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await api.get("/api/turmas", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTurmas(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar turmas:", error);
+      }
+    };
+
+    const userFromStorage = JSON.parse(localStorage.getItem("user"));
+    if (userFromStorage) {
+      setUser(userFromStorage);
+      // Definir o ID do usuário no formulário automaticamente
+      setFormData(prev => ({ ...prev, userId: userFromStorage.id }));
+    }
+
+    buscarTurmas();
+    buscarAvaliacoes();
+  }, []);
+
+  useEffect(() => {
+    if (mensagem || erro) {
+      const timer = setTimeout(() => {
+        setMensagem("");
+        setErro("");
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [mensagem, erro]);
+
+  const handleTurmaChange = (e) => {
+    setSelectedTurma(e.target.value);
+    setFormData((prevData) => ({
+      ...prevData,
+      turmaId: e.target.value,
+    }));
   };
 
   return (
     <div className="container">
       <div className="sidebar">
-        <Link to="/prof/dash" >
-          <i className="fas fa-home"></i> INICIO
-        </Link>
-        <Link to="/prof/atividades">
-          <i className="fas fa-tasks"></i> ATIVIDADES
-        </Link>
-        <Link to="/prof/avaliacoes" className="active">
-          <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
-        </Link>
-        <Link to="/prof/diarios">
-          <i className="fas fa-book"></i> DIÁRIOS
-        </Link>
-        <Link to="/prof/avisos">
-          <i className="fas fa-bell"></i> AVISOS
-        </Link>
-        <Link to="/">
-          <i className="fas fa-sign-out-alt"></i> SAIR
-        </Link>
+        <a href="/prof/dash"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/prof/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="#" className="active"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/prof/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
       <div className="main-content">
@@ -191,9 +222,7 @@ function ProfAvaliacoes() {
           </div>
           <div className="icons">
             <i className="fas fa-envelope"></i>
-            <div className="user">
-              <i className="fas fa-user-circle"></i>
-            </div>
+            <div className="user"><i className="fas fa-user-circle"></i></div>
           </div>
         </div>
 
@@ -201,111 +230,127 @@ function ProfAvaliacoes() {
           <button
             type="button"
             className="add-button"
-            onClick={() => setMostrarFormulario(!mostrarFormulario)}
+            onClick={() => {
+              if (mostrarFormulario && avaliacoesParaEditar) {
+                setAvaliacoesParaEditar(null);
+              }
+              setMostrarFormulario(!mostrarFormulario);
+              if (mostrarFormulario) {
+                // Resetar o formulário quando fechar
+                setFormData({
+                  titulo: "",
+                  descricao: "",
+                  dataInicio: "",
+                  dataFim: "",
+                  turmaId: "",
+                  userId: user?.id || "",
+                  documento: null,
+                });
+                setSelectedTurma("");
+              }
+            }}
           >
-            {avaliacaoParaEditar ? "Cancelar Edição" : "Adicionar Avaliação"}
+            {avaliacoesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
           </button>
         </div>
 
-        {mensagem && <div className="alert alert-success">{mensagem}</div>}
-        {erro && <div className="alert alert-danger">{erro}</div>}
-
         {mostrarFormulario && (
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="titulo">Título</label>
-              <input
-                type="text"
-                id="titulo"
-                name="titulo"
-                className="form-control"
-                value={novaAvaliacao.titulo}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="descricao">Descrição</label>
-              <textarea
-                id="descricao"
-                name="descricao"
-                className="form-control"
-                value={novaAvaliacao.descricao}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="turma">Turma</label>
-              <input
-                type="text"
-                id="turma"
-                name="turma"
-                className="form-control"
-                value={novaAvaliacao.turma}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="dataInicio">Data de Início</label>
-              <input
-                type="date"
-                id="dataInicio"
-                name="dataInicio"
-                className="form-control"
-                value={novaAvaliacao.dataInicio}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="dataFim">Data de Fim</label>
-              <input
-                type="date"
-                id="dataFim"
-                name="dataFim"
-                className="form-control"
-                value={novaAvaliacao.dataFim}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="documento">Documento</label>
-              <input
-                type="file"
-                id="documento"
-                name="documento"
-                className="form-control"
-                onChange={handleFileChange}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">
-              {avaliacaoParaEditar ? "Atualizar Avaliação" : "Criar Avaliação"}
-            </button>
+            <label>Título <span style={{ color: "red" }}>*</span></label>
+            <input
+              type="text"
+              name="titulo"
+              value={formData.titulo}
+              onChange={handleInputChange}
+              required
+            />
+
+            <label>Descrição <span style={{ color: "red" }}>*</span></label>
+            <textarea
+              name="descricao"
+              value={formData.descricao}
+              onChange={handleInputChange}
+              required
+            />
+            <label>
+              Selecionar Turma: <span style={{ color: "red" }}>*</span>
+              <select
+                value={selectedTurma}
+                onChange={handleTurmaChange}
+                required
+              >
+                <option value="">Selecione uma turma</option>
+                {turmas.map((turma) => (
+                  <option key={turma.id} value={turma.id}>
+                    {turma.nome}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>Data Início <span style={{ color: "red" }}>*</span></label>
+            <input
+              type="datetime-local"
+              name="dataInicio"
+              value={formData.dataInicio}
+              onChange={handleInputChange}
+              required
+            />
+            <label>Data Fim <span style={{ color: "red" }}>*</span></label>
+            <input
+              type="datetime-local"
+              name="dataFim"
+              value={formData.dataFim}
+              onChange={handleInputChange}
+              required
+            />
+            <label>Documento</label>
+            <input
+              type="file"
+              name="documento"
+              onChange={handleFileChange}
+            />
+            <label>Seu ID <span style={{ color: "red" }}>*</span></label>
+            <input
+              type="text"
+              name="userId"
+              value={formData.userId}
+              onChange={handleInputChange}
+              required
+              readOnly={user?.id ? true : false}
+            />
+
+            <button type="submit">{avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
           </form>
         )}
 
-        <div className="avaliacao-list">
+        {erro && <div className="error">{erro}</div>}
+        {mensagem && <div className="success">{mensagem}</div>}
+
+        <div className="atividade-list">
           {avaliacoes.map((avaliacao) => (
-            <div className="avaliacao-item" key={avaliacao.id}>
-              <h3>Avaliação: {avaliacao.titulo}</h3>
-              <p>Turma: {avaliacao.turma}</p>
-              <p>Descrição: {avaliacao.descricao}</p>
-              <button onClick={() => handleEditavaliacao(avaliacao)}>Editar</button>
-              <button onClick={() => handleRemoverAvaliacao(avaliacao.id)}>Remover</button>
+            <div key={avaliacao.id} className="atividade-item">
+              <h3>{avaliacao.titulo}</h3>
+              <p>{avaliacao.descricao}</p>
+              <p>Turma ID: {avaliacao.turmaId}</p>
+              <p>Data Início: {new Date(avaliacao.dataInicio).toLocaleString()}</p>
+              <p>Data Fim: {new Date(avaliacao.dataFim).toLocaleString()}</p>
+              <button onClick={() => handleEditaravaliacoes(avaliacao)}>Editar</button>
+              <button onClick={() => handleRemoveravaliacoes(avaliacao.id)}>Excluir</button>
             </div>
           ))}
         </div>
-
-        {mostrarModalExcluir && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <div className="modal-content">
-                <h3>Tem certeza que deseja excluir esta avaliação?</h3>
-                <button onClick={confirmarExclusao}>Excluir</button>
-                <button onClick={cancelarExclusao}>Cancelar</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {mostrarModalExcluir && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>Tem certeza que deseja excluir essa avaliação?</p>
+            <button onClick={confirmarExclusao}>Sim</button>
+            <button onClick={cancelarExclusao}>Não</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

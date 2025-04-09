@@ -1,202 +1,207 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "../atividades/index.css";
+import axios from "axios";
 
-function ProfAtive() {
-  const [loading, setLoading] = useState(true);
-  const [atividades, setAtividades] = useState([]);
-  const [novaAtividade, setNovaAtividade] = useState({
+
+function ProfActive() {
+  const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
-    turmaId: "", // Garantido que é 'turmaId'
     dataInicio: "",
     dataFim: "",
-    documento: null,
+    turmaId: "",
     userId: "",
+    documento: null,
   });
-  const [erro, setErro] = useState("");
-  const [atividadeParaEditar, setAtividadeParaEditar] = useState(null);
-  const [mensagem, setMensagem] = useState("");
+
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [atividades, setAtividade] = useState([]);
+  const [atividadesParaEditar, setAtividadesParaEditar] = useState(null);
+  const [mensagem, setMensagem] = useState("");
+  const [erro, setErro] = useState("");
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
-  const [atividadeIdParaExcluir, setAtividadeIdParaExcluir] = useState(null);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Usuário não autenticado!");
-      return;
-    }
-
-    async function fetchUserData() {
-      try {
-        const res = await api.get("/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(res.data);
-        setNovaAtividade((prev) => ({
-          ...prev,
-          userId: res.data.id,
-        }));
-      } catch (error) {
-        console.error("Erro ao buscar dados do usuário", error);
-        setErro("Erro ao buscar dados do usuário.");
-      }
-    }
-
-    async function fetchAtividades() {
-      try {
-        const res = await api.get("/api/atividades", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAtividades(res.data || []);
-      } catch (error) {
-        console.error("Erro ao buscar atividades", error);
-        setAtividades([]);
-        setErro("Erro ao buscar atividades.");
-      }
-    }
-
-    fetchUserData();
-    fetchAtividades();
-  }, []);
+  const [idParaExcluir, setIdParaExcluir] = useState(null);
+  const [user, setUser] = useState({ name: "Usuário" });
+  const [turmas, setTurmas] = useState([]);
+  const [selectedTurma, setSelectedTurma] = useState("");
 
   const handleInputChange = (e) => {
-    setNovaAtividade((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
     }));
   };
 
   const handleFileChange = (e) => {
-    setNovaAtividade({ ...novaAtividade, documento: e.target.files[0] });
+    setFormData({ ...formData, documento: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    // Verificação de campos obrigatórios
-    if (!novaAtividade.titulo || !novaAtividade.descricao || !novaAtividade.turmaId || !novaAtividade.dataInicio || !novaAtividade.dataFim) {
-      setErro("Preencha todos os campos.");
+    console.log("Dados a serem enviados:", formData);
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    if (!formData.titulo || !formData.descricao || !formData.dataInicio ||
+      !formData.dataFim || !formData.turmaId || !formData.userId) {
+      setErro("Todos os campos são obrigatórios.");
       return;
     }
 
-    // Garantir que a turmaId seja um número
-    const turmaId = Number(novaAtividade.turmaId);
-    if (isNaN(turmaId)) {
-      setErro("O campo 'Turma' deve ser um número válido.");
-      return;
+    const data = new FormData();
+
+    // Adicionar cada campo ao FormData
+    data.append("titulo", formData.titulo);
+    data.append("descricao", formData.descricao);
+    data.append("dataInicio", formData.dataInicio);
+    data.append("dataFim", formData.dataFim);
+    data.append("turmaId", formData.turmaId);
+    data.append("userId", formData.userId);
+
+    // Adicionar documento apenas se existir
+    if (formData.documento) {
+      data.append("documento", formData.documento);
     }
-
-    // Verificação de data
-    const dataInicio = new Date(novaAtividade.dataInicio);
-    const dataFim = new Date(novaAtividade.dataFim);
-    if (dataInicio > dataFim) {
-      setErro("A data de início deve ser anterior à data de fim.");
-      return;
-    }
-
-    // Logar para depuração
-    console.log("Enviando dados para a API: ", {
-      titulo: novaAtividade.titulo,
-      descricao: novaAtividade.descricao,
-      turmaId: turmaId, // Aqui já passamos como número
-      dataInicio: novaAtividade.dataInicio,
-      dataFim: novaAtividade.dataFim,
-      documento: novaAtividade.documento,
-    });
-
-    const formData = new FormData();
-    formData.append("titulo", novaAtividade.titulo);
-    formData.append("descricao", novaAtividade.descricao);
-    formData.append("turmaId", turmaId); // Passando como número
-    formData.append("dataInicio", novaAtividade.dataInicio);
-    formData.append("dataFim", novaAtividade.dataFim);
-    if (novaAtividade.documento) formData.append("documento", novaAtividade.documento);
 
     try {
-      let res;
-      if (atividadeParaEditar) {
-        res = await api.patch(`/api/atividades/${atividadeParaEditar.id}`, formData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setMensagem("Atividade atualizada com sucesso!");
-      } else {
-        res = await api.post("/api/atividades", formData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setMensagem("Atividade criada com sucesso!");
-      }
+      const token = localStorage.getItem("token");
 
-      setAtividades((prev) =>
-        atividadeParaEditar
-          ? prev.map((a) => (a.id === atividadeParaEditar.id ? res.data : a))
-          : [...prev, res.data]
-      );
+      // Usar a API configurada em vez de axios diretamente para manter consistência
+      const response = await api.post("/api/atividades", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      setNovaAtividade({
+      setMensagem(response.data.message || "Atividade criada com sucesso!");
+      setErro("");
+      setFormData({
         titulo: "",
         descricao: "",
-        turmaId: "",
         dataInicio: "",
         dataFim: "",
+        turmaId: "",
+        userId: "",
         documento: null,
-        userId: user?.id || "",
       });
-      setAtividadeParaEditar(null);
+      setSelectedTurma("");
       setMostrarFormulario(false);
-      setTimeout(() => setMensagem(""), 3000);
+      buscarAtividades();
     } catch (error) {
-      console.error("Erro ao adicionar/editar atividade", error.response?.data || error);
-      setErro(error.response?.data?.message || "Erro ao adicionar/editar atividade.");
-      setTimeout(() => setErro(""), 3000);
+      console.error("Erro ao criar atividade:", error);
+      // Exibir mensagem mais detalhada do erro
+      if (error.response && error.response.data && error.response.data.message) {
+        setErro(`Erro: ${error.response.data.message}`);
+      } else {
+        setErro("Erro ao criar atividade. Verifique se todos os campos estão preenchidos corretamente.");
+      }
     }
   };
 
+  // Renomeada para manter consistência
+  const buscarAtividades = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await api.get("/api/atividades", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAtividade(response.data);
+    } catch (error) {
+      console.error('Erro ao criar atividade:', error);
+      console.log('Resposta do servidor:', error.response?.data);
+    }
+  };
 
-  const handleRemoverAtividade = (id) => {
-    setAtividadeIdParaExcluir(id);
+  const handleEditaratividades = (atividade) => {
+    setAtividadesParaEditar(atividade);
+    // Formatando as datas para o formato esperado pelo input datetime-local
+    const dataInicio = atividade.dataInicio ? new Date(atividade.dataInicio).toISOString().slice(0, 16) : "";
+    const dataFim = atividade.dataFim ? new Date(atividade.dataFim).toISOString().slice(0, 16) : "";
+
+    setFormData({
+      ...atividade,
+      dataInicio,
+      dataFim,
+      documento: null,
+    });
+    setSelectedTurma(atividade.turmaId);
+    setMostrarFormulario(true);
+  };
+
+  const handleRemoveratividades = (id) => {
+    setIdParaExcluir(id);
     setMostrarModalExcluir(true);
   };
 
   const confirmarExclusao = async () => {
-    const token = localStorage.getItem("token");
-
     try {
-      await api.delete(`/api/atividades/${atividadeIdParaExcluir}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem("token");
+      await api.delete(`/api/atividades/${idParaExcluir}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      setAtividades((prev) => prev.filter((atividade) => atividade.id !== atividadeIdParaExcluir));
-      setMensagem("Atividade removida com sucesso!");
-      setTimeout(() => setMensagem(""), 3000);
-      setMostrarModalExcluir(false);
+      setMensagem("Atividades excluída com sucesso!");
+      setErro("");
+      buscarAtividades();
     } catch (error) {
-      console.error("Erro ao remover atividade", error.response || error);
-      setErro(error.response?.data?.message || "Erro ao remover atividade.");
-      setTimeout(() => setErro(""), 3000);
+      console.error("Erro ao excluir atividades:", error);
+      setErro("Erro ao excluir atividades.");
+    } finally {
       setMostrarModalExcluir(false);
+      setIdParaExcluir(null);
     }
   };
 
   const cancelarExclusao = () => {
     setMostrarModalExcluir(false);
+    setIdParaExcluir(null);
   };
 
-  const handleEditarAtividade = (atividade) => {
-    setAtividadeParaEditar(atividade);
-    setNovaAtividade({
-      titulo: atividade.titulo,
-      descricao: atividade.descricao,
-      turmaId: atividade.turmaId,
-      dataInicio: atividade.dataInicio,
-      dataFim: atividade.dataFim,
-      documento: atividade.documento,
-      userId: atividade.userId,
-    });
-    setMostrarFormulario(true);
+  useEffect(() => {
+    const buscarTurmas = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await api.get("/api/turmas", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTurmas(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar turmas:", error);
+      }
+    };
+
+    const userFromStorage = JSON.parse(localStorage.getItem("user"));
+    if (userFromStorage) {
+      setUser(userFromStorage);
+      // Definir o ID do usuário no formulário automaticamente
+      setFormData(prev => ({ ...prev, userId: userFromStorage.id }));
+    }
+
+    buscarTurmas();
+    buscarAtividades();
+  }, []);
+
+  useEffect(() => {
+    if (mensagem || erro) {
+      const timer = setTimeout(() => {
+        setMensagem("");
+        setErro("");
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [mensagem, erro]);
+
+  const handleTurmaChange = (e) => {
+    setSelectedTurma(e.target.value);
+    setFormData((prevData) => ({
+      ...prevData,
+      turmaId: e.target.value,
+    }));
   };
 
   return (
@@ -204,7 +209,7 @@ function ProfAtive() {
       <div className="sidebar">
         <a href="/prof/dash"><i className="fas fa-home"></i> INICIO</a>
         <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/prof/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/prof/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
         <a href="/prof/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
         <a href="/prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
@@ -225,48 +230,79 @@ function ProfAtive() {
           <button
             type="button"
             className="add-button"
-            onClick={() => setMostrarFormulario(!mostrarFormulario)}
+            onClick={() => {
+              if (mostrarFormulario && atividadesParaEditar) {
+                setAtividadesParaEditar(null);
+              }
+              setMostrarFormulario(!mostrarFormulario);
+              if (mostrarFormulario) {
+                // Resetar o formulário quando fechar
+                setFormData({
+                  titulo: "",
+                  descricao: "",
+                  dataInicio: "",
+                  dataFim: "",
+                  turmaId: "",
+                  userId: user?.id || "",
+                  documento: null,
+                });
+                setSelectedTurma("");
+              }
+            }}
           >
-            {atividadeParaEditar ? "Cancelar Edição" : "Adicionar Atividade"}
+            {atividadesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
           </button>
         </div>
 
         {mostrarFormulario && (
           <form onSubmit={handleSubmit}>
-            <label>Título</label>
+            <label>Título <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               name="titulo"
-              value={novaAtividade.titulo}
+              value={formData.titulo}
               onChange={handleInputChange}
-            />
-            <label>Descrição</label>
-            <textarea
-              name="descricao"
-              value={novaAtividade.descricao}
-              onChange={handleInputChange}
-            />
-            <label>Turma ID</label>
-            <input
-              type="number"
-              name="turmaId"
-              value={novaAtividade.turmaId}
-              onChange={handleInputChange}
+              required
             />
 
-            <label>Data Início</label>
+            <label>Descrição <span style={{ color: "red" }}>*</span></label>
+            <textarea
+              name="descricao"
+              value={formData.descricao}
+              onChange={handleInputChange}
+              required
+            />
+            <label>
+              Selecionar Turma: <span style={{ color: "red" }}>*</span>
+              <select
+                value={selectedTurma}
+                onChange={handleTurmaChange}
+                required
+              >
+                <option value="">Selecione uma turma</option>
+                {turmas.map((turma) => (
+                  <option key={turma.id} value={turma.id}>
+                    {turma.nome}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>Data Início <span style={{ color: "red" }}>*</span></label>
             <input
               type="datetime-local"
               name="dataInicio"
-              value={novaAtividade.dataInicio}
+              value={formData.dataInicio}
               onChange={handleInputChange}
+              required
             />
-            <label>Data Fim</label>
+            <label>Data Fim <span style={{ color: "red" }}>*</span></label>
             <input
               type="datetime-local"
               name="dataFim"
-              value={novaAtividade.dataFim}
+              value={formData.dataFim}
               onChange={handleInputChange}
+              required
             />
             <label>Documento</label>
             <input
@@ -274,7 +310,17 @@ function ProfAtive() {
               name="documento"
               onChange={handleFileChange}
             />
-            <button type="submit">{atividadeParaEditar ? "Editar Atividade" : "Criar Atividade"}</button>
+            <label>Seu ID <span style={{ color: "red" }}>*</span></label>
+            <input
+              type="text"
+              name="userId"
+              value={formData.userId}
+              onChange={handleInputChange}
+              required
+              readOnly={user?.id ? true : false}
+            />
+
+            <button type="submit">{atividadesParaEditar ? "Editar atividades" : "Criar atividades"}</button>
           </form>
         )}
 
@@ -289,8 +335,8 @@ function ProfAtive() {
               <p>Turma ID: {atividade.turmaId}</p>
               <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
               <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
-              <button onClick={() => handleEditarAtividade(atividade)}>Editar</button>
-              <button onClick={() => handleRemoverAtividade(atividade.id)}>Excluir</button>
+              <button onClick={() => handleEditaratividades(atividade)}>Editar</button>
+              <button onClick={() => handleRemoveratividades(atividade.id)}>Excluir</button>
             </div>
           ))}
         </div>
@@ -299,7 +345,7 @@ function ProfAtive() {
       {mostrarModalExcluir && (
         <div className="modal">
           <div className="modal-content">
-            <p>Tem certeza que deseja excluir essa atividade?</p>
+            <p>Tem certeza que deseja excluir essa avaliação?</p>
             <button onClick={confirmarExclusao}>Sim</button>
             <button onClick={cancelarExclusao}>Não</button>
           </div>
@@ -309,4 +355,4 @@ function ProfAtive() {
   );
 }
 
-export default ProfAtive;
+export default ProfActive;

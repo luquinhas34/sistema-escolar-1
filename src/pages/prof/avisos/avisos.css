@@ -79,7 +79,7 @@ body {
   color: #333;
 }
 .add-button {
-  background-color: #d9b3ff;
+  background-color: #750cdd;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -172,7 +172,7 @@ body {
 }
 
 .add-aviso button:hover {
-  background-color: #45a049;
+  background-color: #a557da;
 }
 .alert {
   padding: 15px;

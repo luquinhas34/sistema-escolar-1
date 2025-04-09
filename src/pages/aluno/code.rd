@@ -1,13 +1,4 @@
 
-function Alunohome() {
-
-
-    return (
-        <h2>aluno</h2>
-    );
-}
-
-export default Alunohome
 
 
 // return (

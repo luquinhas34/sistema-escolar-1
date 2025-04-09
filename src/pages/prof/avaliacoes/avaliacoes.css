@@ -119,13 +119,13 @@ button {
   transition: background-color 0.3s;
 }
 
-.add-button {
+.add-buttonn {
   background-color: #7b61ff;
   color: white;
   font-size: 16px;
 }
 
-.add-button:hover {
+.add-buttonn:hover {
   background-color: #8800f8;
 }
 
