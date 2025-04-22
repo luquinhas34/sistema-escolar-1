@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../inicio/inicio.css";
+import "../inicio/inicio.css"
 
-export default function ChatInicio() {
-    const [loading, setLoading] = useState(true);
+export default function ChatPageAlunoinicio() {
+    const [setLoading] = useState(true);
     const [usuarios, setUsuarios] = useState([]);
     const [filtro, setFiltro] = useState("todas");
     const [userId, setUserId] = useState(null);
@@ -37,10 +37,7 @@ export default function ChatInicio() {
         axios.get("http://localhost:3000/api/chat/usuarios", {
             params: { tipo: filtro === "todas" ? "" : filtro },
         })
-            .then(res => {
-                console.log("Usuários carregados:", res.data); // Verifique os dados aqui
-                setUsuarios(res.data);
-            })
+            .then(res => setUsuarios(res.data))
             .catch(err => console.error("Erro ao buscar usuários", err));
     }, [filtro]);
 
@@ -70,49 +67,24 @@ export default function ChatInicio() {
             : partes[0][0] + partes[partes.length - 1][0];
     };
 
-    const filterChats = () => {
-        // Verifica se 'usuarios' e 'userId' estão carregados corretamente
-        if (!usuarios || !userId) return [];
-
-        // Filtra por 'role' e exclui o usuário atual
-        return usuarios.filter(u => u.id !== userId && (filtro === "todas" || u.role === filtro));
-    };
-
-    const handleFilterChange = (catValue) => {
-        console.log("Filtro selecionado:", catValue);  // Verifique o filtro
-        setFiltro(catValue);
-    };
-
     return (
-        <div className="chat-page">
-            <div className="sidebarr">
-                <a href="/prof/dash">
-                    <i className="fas fa-home"></i> INICIO
-                </a>
-                <a href="/prof/atividades">
-                    <i className="fas fa-tasks"></i> ATIVIDADES
-                </a>
-                <a href="/prof/avaliacoes">
-                    <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
-                </a>
-                <a href="/prof/diarios">
-                    <i className="fas fa-book"></i> DIÁRIOS
-                </a>
-                <a href="/prof/avisos">
-                    <i className="fas fa-bell"></i> AVISOS
-                </a>
-                <a href="/">
-                    <i className="fas fa-sign-out-alt"></i> SAIR
-                </a>
+        <div className="chat-page" >
+            <div className="sidebar">
+                <a href="/resp/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/resp/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/resp/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+                <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+                <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
 
-            <div className="main-content">
-                <div className="header">
+            <div className="main-content" >
+                <div className="header" >
                     <div className="welcome">
-                        Olá, Bem-vindo <strong><h1>{user?.name || "Usuário"}</h1></strong>
+                        Olá, Bem-vindo <strong><h1 >{user?.name || "Usuário"}</h1></strong>
                     </div>
-                    <div className="icons">
-                        <a href="/prof/chat" className="active"><i className="fas fa-envelope"></i></a>
+                    <div className="icons" >
+                        <a href="/resp/chat" className="active"><i className="fas fa-envelope"></i></a>
                         <div className="user"><i className="fas fa-user-circle"></i></div>
                     </div>
                 </div>
@@ -126,7 +98,7 @@ export default function ChatInicio() {
                             {categorias.map((cat) => (
                                 <button
                                     key={cat.value}
-                                    onClick={() => handleFilterChange(cat.value)}
+                                    onClick={() => setFiltro(cat.value)}
                                     style={{
                                         padding: "10px 15px",
                                         background: filtro === cat.value ? "#a463f5" : "#f5f5f5",
@@ -143,39 +115,33 @@ export default function ChatInicio() {
                             ))}
                         </div>
 
-                        {loading ? (
+                        {userId && usuarios.filter(u => u.id !== userId).map((u) => (
+                            <div
+                                key={u.id}
+                                onClick={() => iniciarChat(u.id)}
+                                style={{
+                                    display: "flex", alignItems: "center", marginBottom: "15px",
+                                    cursor: "pointer", borderBottom: "1px solid #eee", paddingBottom: "10px",
+                                }}
+                            >
+                                <div style={{
+                                    background: "#a463f5", color: "#fff", width: "40px", height: "40px",
+                                    borderRadius: "50%", display: "flex", alignItems: "center",
+                                    justifyContent: "center", fontWeight: "bold", marginRight: "10px",
+                                }}>
+                                    {getIniciais(u.name)}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <strong>{u.name}</strong>
+                                    <div style={{ fontSize: "14px", color: "#777" }}>Clique para conversar</div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {!userId && (
                             <div style={{ textAlign: "center", marginTop: "40px", color: "#666" }}>
                                 Carregando usuário...
                             </div>
-                        ) : (
-                            filterChats().length === 0 ? (
-                                <div style={{ textAlign: "center", marginTop: "40px", color: "#666" }}>
-                                    Nenhuma conversa encontrada.
-                                </div>
-                            ) : (
-                                filterChats().map((u) => (
-                                    <div
-                                        key={u.id}
-                                        onClick={() => iniciarChat(u.id)}
-                                        style={{
-                                            display: "flex", alignItems: "center", marginBottom: "15px",
-                                            cursor: "pointer", borderBottom: "1px solid #eee", paddingBottom: "10px",
-                                        }}
-                                    >
-                                        <div style={{
-                                            background: "#a463f5", color: "#fff", width: "40px", height: "40px",
-                                            borderRadius: "50%", display: "flex", alignItems: "center",
-                                            justifyContent: "center", fontWeight: "bold", marginRight: "10px",
-                                        }}>
-                                            {getIniciais(u.name)}
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <strong>{u.name}</strong>
-                                            <div style={{ fontSize: "14px", color: "#777" }}>Clique para conversar</div>
-                                        </div>
-                                    </div>
-                                ))
-                            )
                         )}
                     </div>
                 </div>

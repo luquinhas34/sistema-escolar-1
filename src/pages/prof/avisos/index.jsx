@@ -135,7 +135,7 @@ function Profaviso() {
                         Olá, Bem-vindo <strong>Carlos Pereira</strong>
                     </div>
                     <div className="icons">
-                        <i className="fas fa-envelope"></i>
+                        <a href="/prof/chat" className="active"><i className="fas fa-envelope"></i></a>
                         <div className="user">
                             <i className="fas fa-user-circle"></i>
                         </div>

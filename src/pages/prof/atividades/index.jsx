@@ -221,7 +221,7 @@ function ProfActive() {
             Olá, Bem-vindo <strong><h1>{user?.name || "Usuário"}</h1></strong>
           </div>
           <div className="icons">
-            <i className="fas fa-envelope"></i>
+            <a href="/prof/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user"><i className="fas fa-user-circle"></i></div>
           </div>
         </div>

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../../services/api";
-import "./Profhome.css";
+import "../dash/home.css";
 
-function Profhome() {
+function Resphome() {
   const [user, setUser] = useState(null);
   const [dados, setDados] = useState({
     atividades: 0,
@@ -66,25 +66,12 @@ function Profhome() {
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
       />
       <div className="sidebar">
-        <Link to="#" className="active">
-          <i className="fas fa-home"></i> INÍCIO
-        </Link>
-        <Link to="/prof/atividades">
-          <i className="fas fa-tasks"></i> ATIVIDADES
-        </Link>
-        <Link to="/prof/avaliacoes">
-          <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
-        </Link>
-
-        <Link to="/prof/diarios">
-          <i className="fas fa-book"></i> DIÁRIOS
-        </Link>
-        <Link to="/prof/avisos">
-          <i className="fas fa-bell"></i> AVISOS
-        </Link>
-        <Link to="/">
-          <i className="fas fa-sign-out-alt"></i> SAIR
-        </Link>
+        <a href="#" className="active"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/resp/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/resp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="main-content">
         <div className="header">
@@ -92,7 +79,7 @@ function Profhome() {
             Olá, Bem-vindo <strong><h1>{user?.name}</h1></strong>
           </div>
           <div className="icons">
-            <a href="/prof/chat" className="active"><i className="fas fa-envelope"></i></a>
+            <a href="/resp/chat.resp/inicio" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user">
               <i className="fas fa-user-circle"></i>
             </div>
@@ -132,4 +119,4 @@ function Profhome() {
   );
 }
 
-export default Profhome;
+export default Resphome;

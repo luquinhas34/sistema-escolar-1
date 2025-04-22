@@ -1,247 +1,122 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import api from "../../../services/api";
+import "../dash/home.css";
 
+function AlunoDash() {
+  const [user, setUser] = useState(null);
+  const [dados, setDados] = useState({
+    atividades: 0,
+    avaliacoes: 0,
+    diarios: 0,
+    avisos: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-export default function ChatPage() {
-    const [usuarios, setUsuarios] = useState([]);
-    const [filtro, setFiltro] = useState("todas");
-    const [chatId, setChatId] = useState(null);
-    const [mensagens, setMensagens] = useState([]);
-    const [novaMensagem, setNovaMensagem] = useState("");
-    const [userId, setUserId] = useState(null);
+  async function fetchUserAndData() {
+    const token = localStorage.getItem("token");
 
-    const navigate = useNavigate();
-    const { id } = useParams(); // id da URL
+    if (!token) {
+      console.error("Usuário não autenticado!");
+      navigate("/");
+      return;
+    }
 
-    const categorias = [
-        { label: "Todas", value: "todas" },
-        { label: "Coordenação", value: "cood_vall" },
-        { label: "Professores", value: "prof_vall" },
-        { label: "Responsáveis", value: "resp_vall" },
-    ];
+    try {
+      console.log("Buscando dados do usuário...");
+      const userRes = await api.get("/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(userRes.data);
 
-    // Pega usuário logado
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) return navigate("/login");
+      const endpoints = [
+        { key: "atividades", url: "/api/atividades" },
+        { key: "avaliacoes", url: "/api/avaliacoes" },
+        { key: "diarios", url: "/api/diarios" },
+        { key: "avisos", url: "/api/avisos" },
+      ];
 
-        axios.get("http://localhost:3000/api/me", {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => setUserId(res.data.id))
-            .catch(() => navigate("/login"));
-    }, []);
+      for (const { key, url } of endpoints) {
+        const res = await api.get(url, { headers: { Authorization: `Bearer ${token}` } });
+        setDados((prev) => ({
+          ...prev,
+          [key]: key === "avisos" ? (Array.isArray(res.data) ? res.data : []) : res.data.length,
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error.message);
+      navigate("/prof/dash");
+    } finally {
+      setLoading(false);
+    }
+  }
 
+  useEffect(() => {
+    fetchUserAndData();
+  }, []);
 
+  if (loading) return <div>Carregando...</div>;
+  if (!user) return <div>Usuário não autenticado!</div>;
 
-    // Busca usuários com filtro
-    useEffect(() => {
-        axios.get("http://localhost:3000/api/chat/usuarios", {
-            params: { tipo: filtro === "todas" ? "" : filtro },
-        })
-            .then(res => setUsuarios(res.data))
-            .catch(err => console.error("Erro ao buscar usuários", err));
-    }, [filtro]);
-
-    // Atualiza mensagens
-    useEffect(() => {
-        const chatAtivo = chatId || id;
-
-        if (!chatAtivo || !userId) return;
-
-        const buscarMensagens = async () => {
-            try {
-                const res = await axios.get(`http://localhost:3000/api/chat/mensagens/${chatAtivo}`);
-                setMensagens(res.data);
-            } catch (err) {
-                console.error("Erro ao buscar mensagens", err);
-            }
-        };
-
-        buscarMensagens();
-        const interval = setInterval(buscarMensagens, 3000);
-        return () => clearInterval(interval);
-    }, [id, chatId, userId]);
-
-    // Iniciar novo chat
-    const iniciarChat = async (user2Id) => {
-        if (!userId || !user2Id) return;
-
-        try {
-            const res = await axios.post("http://localhost:3000/api/chat/conectar", {
-                user1: userId,
-                user2: user2Id,
-            });
-
-            const novoChatId = res.data.chatId;
-            setChatId(novoChatId);
-            navigate(`/prof/chat/${novoChatId}`); // ← aqui estava errado!
-
-        } catch (err) {
-            console.error("Erro ao iniciar chat", err);
-        }
-    };
-
-
-
-    const enviarMensagem = async () => {
-        const chatAtivo = id || chatId;
-        if (!novaMensagem.trim() || !chatAtivo || !userId) return;
-
-        try {
-            await axios.post("http://localhost:3000/api/chat/mensagens", {
-                chatId: chatAtivo,
-                remetenteId: userId,
-                texto: novaMensagem,
-            });
-            setNovaMensagem("");
-        } catch (err) {
-            console.error("Erro ao enviar mensagem", err);
-        }
-    };
-
-    const getIniciais = (nome) => {
-        const partes = nome.trim().split(" ");
-        return partes.length === 1
-            ? partes[0][0]
-            : partes[0][0] + partes[partes.length - 1][0];
-    };
-
-    const chatAtivo = id || chatId;
-
-    return (
-        <div style={{ padding: "40px", position: "relative" }}>
-            <div style={{
-                maxWidth: "700px",
-                margin: "0 auto",
-                background: "#fff",
-                border: "2px solid #a463f5",
-                borderRadius: "8px",
-                padding: "20px"
-            }}>
-                {/* Filtro e lista */}
-                {!chatAtivo && (
-                    <>
-                        <div style={{ display: "flex", marginBottom: "20px" }}>
-                            {categorias.map((cat) => (
-                                <button
-                                    key={cat.value}
-                                    onClick={() => setFiltro(cat.value)}
-                                    style={{
-                                        padding: "10px 15px",
-                                        background: filtro === cat.value ? "#a463f5" : "#f5f5f5",
-                                        color: filtro === cat.value ? "#fff" : "#555",
-                                        borderRadius: "8px",
-                                        border: "none",
-                                        marginRight: "10px",
-                                        cursor: "pointer",
-                                        fontWeight: "bold",
-                                    }}
-                                >
-                                    {cat.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {usuarios.filter(u => u.id !== userId).map((u) => (
-                            <div
-                                key={u.id}
-                                onClick={() => iniciarChat(u.id)}
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    marginBottom: "15px",
-                                    cursor: "pointer",
-                                    borderBottom: "1px solid #eee",
-                                    paddingBottom: "10px",
-                                }}
-                            >
-                                <div style={{
-                                    background: "#a463f5",
-                                    color: "#fff",
-                                    width: "40px",
-                                    height: "40px",
-                                    borderRadius: "50%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontWeight: "bold",
-                                    marginRight: "10px",
-                                }}>
-                                    {getIniciais(u.name)}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <strong>{u.name}</strong>
-                                    <div style={{ fontSize: "14px", color: "#777" }}>
-                                        Clique para conversar
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                )}
-
-                {/* Chat ativo */}
-                {chatAtivo && userId && (
-                    <div style={{ maxHeight: "400px", overflowY: "auto", padding: "10px 0" }}>
-                        {mensagens.map((m, idx) => (
-                            <div key={idx} style={{
-                                textAlign: m.remetente.id === userId ? "right" : "left",
-                                marginBottom: "10px"
-                            }}>
-                                <div style={{
-                                    display: "inline-block",
-                                    background: m.remetente.id === userId ? "#a463f5" : "#eee",
-                                    color: m.remetente.id === userId ? "#fff" : "#000",
-                                    padding: "8px 12px",
-                                    borderRadius: "15px",
-                                    maxWidth: "70%",
-                                }}>
-                                    {m.texto}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+  return (
+    <div className="display-flex">
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      />
+      <div className="sidebar">
+        <a href="#" className="active"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/resp/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/resp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
+      </div>
+      <div className="main-content">
+        <div className="header">
+          <div className="welcome">
+            Olá, Bem-vindo <strong><h1>{user?.name}</h1></strong>
+          </div>
+          <div className="icons">
+            <a href="/resp/chat.resp/inicio" className="active"><i className="fas fa-envelope"></i></a>
+            <div className="user">
+              <i className="fas fa-user-circle"></i>
             </div>
-
-            {/* Input de mensagem */}
-            {chatAtivo && userId && (
-                <div style={{ position: "fixed", bottom: "40px", right: "40px" }}>
-                    <input
-                        type="text"
-                        placeholder="Digite uma mensagem"
-                        value={novaMensagem}
-                        onChange={(e) => setNovaMensagem(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && enviarMensagem()}
-                        style={{
-                            padding: "10px",
-                            width: "300px",
-                            borderRadius: "30px",
-                            border: "1px solid #ccc",
-                            marginRight: "10px",
-                            outline: "none",
-                        }}
-                    />
-                    <button
-                        onClick={enviarMensagem}
-                        style={{
-                            background: "#a463f5",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "50%",
-                            width: "50px",
-                            height: "50px",
-                            cursor: "pointer",
-                            fontSize: "20px",
-                        }}
-                    >
-                        📨
-                    </button>
-                </div>
-            )}
+          </div>
         </div>
-    );
+        <div className="info-cards">
+          <div className="info-card">
+            <h3>Número de atividades cadastradas</h3>
+            <p>{dados.atividades} <span>Total</span></p>
+          </div>
+          <div className="info-card">
+            <h3>Número de avaliações cadastradas</h3>
+            <p>{dados.avaliacoes} <span>Total</span></p>
+          </div>
+          <div className="info-card">
+            <h3>Número de diários cadastrados</h3>
+            <p>{dados.diarios} <span>Total</span></p>
+          </div>
+        </div>
+        <div className="section">
+          <h2>Avisos</h2>
+          <div className="cards">
+            {dados.avisos.length === 0 ? (
+              <p>Não há avisos disponíveis.</p>
+            ) : (
+              dados.avisos.map((aviso, index) => (
+                <div key={index} className="card">
+                  <h3> Titulo {aviso.titulo}</h3>
+                  <p><strong>Descrição:</strong> {aviso.descricao}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+export default AlunoDash;

@@ -4,7 +4,7 @@ import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import "../conversa/ChatPage.css";
 
-const ChatPageProf = () => {
+const ChatPageResp = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const scrollRef = useRef(null);
@@ -13,38 +13,28 @@ const ChatPageProf = () => {
     const [chatInfo, setChatInfo] = useState(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [usuario, setUsuario] = useState({});
-    const [loading, setLoading] = useState(true);
-
-    // Busca mensagens do chat
-    useEffect(() => {
-        const buscarMensagens = async () => {
-            setLoading(true);
-            try {
-                const { data } = await axios.get(`http://localhost:3000/chat/${id}`);
-                setMensagens(data.mensagens);
-                setChatInfo(data.chat);
-            } catch (error) {
-                console.error("Erro ao buscar mensagens:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (id) buscarMensagens();
-    }, [id]);
-
 
     // Carrega o usuário logado
     useEffect(() => {
         const userStorage = localStorage.getItem("usuario");
         if (!userStorage) return navigate("/login");
         setUsuario(JSON.parse(userStorage));
-    }
-        , [navigate]);
+    }, [navigate]);
 
+    // Busca mensagens do chat
+    useEffect(() => {
+        const buscarMensagens = async () => {
+            try {
+                const { data } = await axios.get(`http://localhost:3000/chat/${id}`);
+                setMensagens(data.mensagens);
+                setChatInfo(data.chat);
+            } catch (error) {
+                console.error("Erro ao buscar mensagens:", error);
+            }
+        };
 
-
-
+        if (id) buscarMensagens();
+    }, [id]);
 
     // Scroll automático ao final
     useEffect(() => {
@@ -55,21 +45,12 @@ const ChatPageProf = () => {
 
     // Envia nova mensagem
     const enviarMensagem = async () => {
-        if (!usuario?.id) {
-            console.error("Usuário não carregado.");
-            return;
-        }
-
-        if (!novaMensagem.trim()) {
-            console.error("Mensagem vazia.");
-            return;
-        }
-
+        if (!novaMensagem.trim()) return;
         try {
             const nova = {
                 texto: novaMensagem,
                 chatId: parseInt(id),
-                remetenteId: usuario.id,
+                remetenteId: usuario.id, // Usa o ID real do usuário logado
             };
             const { data } = await axios.post("http://localhost:3000/api/chat/mensagens", nova);
             setMensagens((prev) => [...prev, data]);
@@ -79,22 +60,20 @@ const ChatPageProf = () => {
         }
     };
 
-
     // Seleciona emoji
     const handleEmojiClick = (emojiData) => {
         setNovaMensagem((prev) => prev + emojiData.emoji);
     };
 
-
     return (
         <div className="bodyy">
             <div className="chat-container">
                 <div className="sidebar">
-                    <a href="/prof/dash"><i className="fas fa-home"></i> INICIO</a>
-                    <a href="/prof/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                    <a href="/prof/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-                    <a href="/prof/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
-                    <a href="/prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+                    <a href="/resp/dash"><i className="fas fa-home"></i> INICIO</a>
+                    <a href="/resp/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                    <a href="/resp/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                    <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+                    <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
                     <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
                 </div>
 
@@ -103,7 +82,7 @@ const ChatPageProf = () => {
                         Olá, Bem-vindo <strong><h1>{usuario?.name || "Usuário"}</h1></strong>
                     </div>
                     <div className="icons">
-                        <a href="/prof/chat" className="active"><i className="fas fa-envelope"></i></a>
+                        <a href="/res/chat" className="active"><i className="fas fa-envelope"></i></a>
                         <div className="user"><i className="fas fa-user-circle"></i></div>
                     </div>
                 </div>
@@ -162,4 +141,4 @@ const ChatPageProf = () => {
     );
 };
 
-export default ChatPageProf;
+export default ChatPageResp;

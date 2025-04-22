@@ -205,7 +205,7 @@ const DiarioDePresenca = () => {
         <div className="container">
             <div className="sidebar">
                 <a href="/prof/dash" ><i className="fas fa-home"></i> INICIO</a>
-                <a href="/prof/atividade"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/prof/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
                 <a href="/prof/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
                 <a href="#" className="active"><i className="fas fa-book"></i> DIARIOS</a>
                 <a href="/prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
@@ -216,7 +216,7 @@ const DiarioDePresenca = () => {
                 <div className="header">
                     <div className="welcome">Olá, Bem-vindo <strong>Carlos Pereira</strong></div>
                     <div className="icons">
-                        <i className="fas fa-envelope"></i>
+                        <a href="/prof/chat" className="active"><i className="fas fa-envelope"></i></a>
                         <div className="user">
                             <i className="fas fa-user-circle"></i>
                         </div>

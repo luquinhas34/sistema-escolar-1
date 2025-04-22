@@ -23,11 +23,11 @@ function Login() {
 
     try {
       const res = await api.post("/api/login", { email, password });
-      console.log(res.data); // Verifica a resposta do backend
+      console.log(res.data); // Verifique o que está sendo retornado do backend
 
-      if (res.data && res.data.token && res.data.role) {
+      if (res.data && res.data.token && res.data.role) { // Verifique o campo `role` corretamente
         localStorage.setItem("token", res.data.token);
-        const userRole = res.data.role.trim().toLowerCase();
+        const userRole = res.data.role.trim().toLowerCase(); // Acesse `role` diretamente
 
         const roleRoutes = {
           aluno_vall: "/aluno/dash",
@@ -48,6 +48,7 @@ function Login() {
       } else {
         setError("Erro ao autenticar: Token ou role inválidos.");
       }
+
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message || error.message
@@ -55,6 +56,7 @@ function Login() {
       setError(errorMessage);
     }
   }
+
 
   async function fetchUserAndData() {
     try {
