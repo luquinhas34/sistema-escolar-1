@@ -1,0 +1,159 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.main {
+  padding-left: -1000;
+  margin: 20px;
+}
+.main-content {
+  width: 76vw; /* Garante que ocupe toda a largura da tela */
+  height: 70vh;
+  margin-left: 250px;
+  padding-bottom: 46%;
+
+  flex-grow: 1;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.sidebar {
+  width: 250px;
+  background-color: #ffffff;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  height: 100vh;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #f1f1f1;
+}
+
+.sidebar a.active {
+  background-color: #7b61ff;
+  color: #ffffff;
+}
+
+.sidebar a i {
+  margin-right: 10px;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header .welcome {
+  font-size: 18px;
+  color: #6c757d;
+}
+
+.header .icons {
+  display: flex;
+  align-items: center;
+}
+
+.header .icons i {
+  font-size: 20px;
+  color: #6c757d;
+  margin-right: 20px;
+}
+
+.header .icons .user {
+  display: flex;
+  align-items: center;
+}
+
+.header .icons .user i {
+  font-size: 30px;
+  color: #6c757d;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+input,
+select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+select:focus,
+input:focus {
+  outline: none;
+  border-color: #7b61ff;
+  box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  z-index: 1000;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.modal .buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal .buttons button {
+  font-weight: bold;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+.text-center {
+  text-align: center;
+}

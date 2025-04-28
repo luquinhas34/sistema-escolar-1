@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../../services/api";
 import "../dash/style.css";
 
-function Resphome() {
+function Profhome() {
   const [user, setUser] = useState(null);
   const [dados, setDados] = useState({
     atividades: 0,
@@ -67,10 +67,13 @@ function Resphome() {
       />
       <div className="sidebar">
         <a href="#" className="active"><i className="fas fa-home"></i> INICIO</a>
-        <a href="/resp/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-        <a href="/resp/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
-        <a href="/resp/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/cood/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/cood/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/cood/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="main-content">
@@ -79,7 +82,7 @@ function Resphome() {
             Olá, Bem-vindo <strong><h1>{user?.name}</h1></strong>
           </div>
           <div className="icons">
-            <a href="/resp/chat.resp/inicio" className="active"><i className="fas fa-envelope"></i></a>
+            <a href="/cood/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user">
               <i className="fas fa-user-circle"></i>
             </div>
@@ -119,4 +122,4 @@ function Resphome() {
   );
 }
 
-export default Resphome;
+export default Profhome;

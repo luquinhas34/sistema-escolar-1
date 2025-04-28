@@ -43,7 +43,10 @@ git remote add origin https://github.com/seu-usuario/nome-do-repo.git
 ## 🚀 0.3 Enviando para o GitHub
 
 ```bash
+git add .
+git commit -m "sua mensagem de commit"
 git push
+
 ```
 
 > Se seu branch local for `master`, substitua `main` por `master`

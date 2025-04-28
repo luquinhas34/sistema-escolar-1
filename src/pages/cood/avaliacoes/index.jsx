@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-import "../atividades/index.css";
+import "../avaliacoes/style.css";
 
 
-function AlunoActive() {
+function ProfAvaliacoes() {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -15,9 +15,12 @@ function AlunoActive() {
   });
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [atividades, setAtividade] = useState([]);
+  const [avaliacoes, setAvaliacoes] = useState([]);
+  const [avaliacoesParaEditar, setAvaliacoesParaEditar] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
+  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
+  const [idParaExcluir, setIdParaExcluir] = useState(null);
   const [user, setUser] = useState({ name: "Usuário" });
   const [turmas, setTurmas] = useState([]);
   const [selectedTurma, setSelectedTurma] = useState("");
@@ -63,14 +66,14 @@ function AlunoActive() {
       const token = localStorage.getItem("token");
 
       // Usar a API configurada em vez de axios diretamente para manter consistência
-      const response = await api.post("/api/atividades", data, {
+      const response = await api.post("/api/avaliacoes", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setMensagem(response.data.message || "Atividade criada com sucesso!");
+      setMensagem(response.data.message || "Avaliação criada com sucesso!");
       setErro("");
       setFormData({
         titulo: "",
@@ -83,38 +86,79 @@ function AlunoActive() {
       });
       setSelectedTurma("");
       setMostrarFormulario(false);
-      buscarAtividades();
+      buscarAvaliacoes();
     } catch (error) {
-      console.error("Erro ao criar atividade:", error);
+      console.error("Erro ao criar avaliação:", error);
       // Exibir mensagem mais detalhada do erro
       if (error.response && error.response.data && error.response.data.message) {
         setErro(`Erro: ${error.response.data.message}`);
       } else {
-        setErro("Erro ao criar atividade. Verifique se todos os campos estão preenchidos corretamente.");
+        setErro("Erro ao criar avaliação. Verifique se todos os campos estão preenchidos corretamente.");
       }
     }
   };
 
   // Renomeada para manter consistência
-  const buscarAtividades = async () => {
+  const buscarAvaliacoes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await api.get("/api/atividades", {
+      const response = await api.get("/api/avaliacoes", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setAtividade(response.data);
+      setAvaliacoes(response.data);
     } catch (error) {
-      console.error('Erro ao criar atividade:', error);
+      console.error('Erro ao criar avaliação:', error);
       console.log('Resposta do servidor:', error.response?.data);
     }
   };
 
+  const handleEditaravaliacoes = (avaliacao) => {
+    setAvaliacoesParaEditar(avaliacao);
+    // Formatando as datas para o formato esperado pelo input datetime-local
+    const dataInicio = avaliacao.dataInicio ? new Date(avaliacao.dataInicio).toISOString().slice(0, 16) : "";
+    const dataFim = avaliacao.dataFim ? new Date(avaliacao.dataFim).toISOString().slice(0, 16) : "";
 
+    setFormData({
+      ...avaliacao,
+      dataInicio,
+      dataFim,
+      documento: null,
+    });
+    setSelectedTurma(avaliacao.turmaId);
+    setMostrarFormulario(true);
+  };
 
+  const handleRemoveravaliacoes = (id) => {
+    setIdParaExcluir(id);
+    setMostrarModalExcluir(true);
+  };
 
+  const confirmarExclusao = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.delete(`/api/avaliacoes/${idParaExcluir}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMensagem("Avaliação excluída com sucesso!");
+      setErro("");
+      buscarAvaliacoes();
+    } catch (error) {
+      console.error("Erro ao excluir avaliações:", error);
+      setErro("Erro ao excluir avaliações.");
+    } finally {
+      setMostrarModalExcluir(false);
+      setIdParaExcluir(null);
+    }
+  };
 
+  const cancelarExclusao = () => {
+    setMostrarModalExcluir(false);
+    setIdParaExcluir(null);
+  };
 
   useEffect(() => {
     const buscarTurmas = async () => {
@@ -137,7 +181,7 @@ function AlunoActive() {
     }
 
     buscarTurmas();
-    buscarAtividades();
+    buscarAvaliacoes();
   }, []);
 
   useEffect(() => {
@@ -162,11 +206,14 @@ function AlunoActive() {
   return (
     <div className="container">
       <div className="sidebar">
-        <a href="/resp/dash"><i className="fas fa-home"></i> INICIO</a>
-        <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/resp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
-        <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/cood/dash"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/cood/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="#" className="active" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/cood/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
@@ -176,11 +223,38 @@ function AlunoActive() {
             Olá, Bem-vindo <strong><h1>{user?.name || "Usuário"}</h1></strong>
           </div>
           <div className="icons">
-            <a href="/resp/chat" className="active"><i className="fas fa-envelope"></i></a>
+            <a href="/cood/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user"><i className="fas fa-user-circle"></i></div>
           </div>
         </div>
 
+        <div>
+          <button
+            type="button"
+            className="add-button"
+            onClick={() => {
+              if (mostrarFormulario && avaliacoesParaEditar) {
+                setAvaliacoesParaEditar(null);
+              }
+              setMostrarFormulario(!mostrarFormulario);
+              if (mostrarFormulario) {
+                // Resetar o formulário quando fechar
+                setFormData({
+                  titulo: "",
+                  descricao: "",
+                  dataInicio: "",
+                  dataFim: "",
+                  turmaId: "",
+                  userId: user?.id || "",
+                  documento: null,
+                });
+                setSelectedTurma("");
+              }
+            }}
+          >
+            {avaliacoesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
+          </button>
+        </div>
 
         {mostrarFormulario && (
           <form onSubmit={handleSubmit}>
@@ -248,7 +322,7 @@ function AlunoActive() {
               readOnly={user?.id ? true : false}
             />
 
-
+            <button type="submit">{avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
           </form>
         )}
 
@@ -256,20 +330,31 @@ function AlunoActive() {
         {mensagem && <div className="success">{mensagem}</div>}
 
         <div className="atividade-list">
-          {atividades.map((atividade) => (
-            <div key={atividade.id} className="atividade-item">
-              <h3>{atividade.titulo}</h3>
-              <p>{atividade.descricao}</p>
-              <p>Turma ID: {atividade.turmaId}</p>
-              <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
-              <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
-
+          {avaliacoes.map((avaliacao) => (
+            <div key={avaliacao.id} className="atividade-item">
+              <h3>{avaliacao.titulo}</h3>
+              <p>{avaliacao.descricao}</p>
+              <p>Turma ID: {avaliacao.turmaId}</p>
+              <p>Data Início: {new Date(avaliacao.dataInicio).toLocaleString()}</p>
+              <p>Data Fim: {new Date(avaliacao.dataFim).toLocaleString()}</p>
+              <button onClick={() => handleEditaravaliacoes(avaliacao)}>Editar</button>
+              <button onClick={() => handleRemoveravaliacoes(avaliacao.id)}>Excluir</button>
             </div>
           ))}
         </div>
       </div>
-    </div >
+
+      {mostrarModalExcluir && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>Tem certeza que deseja excluir essa avaliação?</p>
+            <button onClick={confirmarExclusao}>Sim</button>
+            <button onClick={cancelarExclusao}>Não</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-export default AlunoActive
+export default ProfAvaliacoes;

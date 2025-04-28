@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-import "../atividades/index.css";
+import "../atividades/style.css";
 
-
-function AlunoActive() {
+function ProfActive() {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -16,8 +15,11 @@ function AlunoActive() {
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [atividades, setAtividade] = useState([]);
+  const [atividadesParaEditar, setAtividadesParaEditar] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
+  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
+  const [idParaExcluir, setIdParaExcluir] = useState(null);
   const [user, setUser] = useState({ name: "Usuário" });
   const [turmas, setTurmas] = useState([]);
   const [selectedTurma, setSelectedTurma] = useState("");
@@ -111,10 +113,51 @@ function AlunoActive() {
     }
   };
 
+  const handleEditaratividades = (atividade) => {
+    setAtividadesParaEditar(atividade);
+    // Formatando as datas para o formato esperado pelo input datetime-local
+    const dataInicio = atividade.dataInicio ? new Date(atividade.dataInicio).toISOString().slice(0, 16) : "";
+    const dataFim = atividade.dataFim ? new Date(atividade.dataFim).toISOString().slice(0, 16) : "";
 
+    setFormData({
+      ...atividade,
+      dataInicio,
+      dataFim,
+      documento: null,
+    });
+    setSelectedTurma(atividade.turmaId);
+    setMostrarFormulario(true);
+  };
 
+  const handleRemoveratividades = (id) => {
+    setIdParaExcluir(id);
+    setMostrarModalExcluir(true);
+  };
 
+  const confirmarExclusao = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.delete(`/api/atividades/${idParaExcluir}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMensagem("Atividades excluída com sucesso!");
+      setErro("");
+      buscarAtividades();
+    } catch (error) {
+      console.error("Erro ao excluir atividades:", error);
+      setErro("Erro ao excluir atividades.");
+    } finally {
+      setMostrarModalExcluir(false);
+      setIdParaExcluir(null);
+    }
+  };
 
+  const cancelarExclusao = () => {
+    setMostrarModalExcluir(false);
+    setIdParaExcluir(null);
+  };
 
   useEffect(() => {
     const buscarTurmas = async () => {
@@ -162,11 +205,14 @@ function AlunoActive() {
   return (
     <div className="container">
       <div className="sidebar">
-        <a href="/resp/dash"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/cood/dash"><i className="fas fa-home"></i> INICIO</a>
         <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/resp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
-        <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/cood/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/cood/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
@@ -176,11 +222,38 @@ function AlunoActive() {
             Olá, Bem-vindo <strong><h1>{user?.name || "Usuário"}</h1></strong>
           </div>
           <div className="icons">
-            <a href="/resp/chat" className="active"><i className="fas fa-envelope"></i></a>
+            <a href="/cood/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user"><i className="fas fa-user-circle"></i></div>
           </div>
         </div>
 
+        <div>
+          <button
+            type="button"
+            className="add-button"
+            onClick={() => {
+              if (mostrarFormulario && atividadesParaEditar) {
+                setAtividadesParaEditar(null);
+              }
+              setMostrarFormulario(!mostrarFormulario);
+              if (mostrarFormulario) {
+                // Resetar o formulário quando fechar
+                setFormData({
+                  titulo: "",
+                  descricao: "",
+                  dataInicio: "",
+                  dataFim: "",
+                  turmaId: "",
+                  userId: user?.id || "",
+                  documento: null,
+                });
+                setSelectedTurma("");
+              }
+            }}
+          >
+            {atividadesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
+          </button>
+        </div>
 
         {mostrarFormulario && (
           <form onSubmit={handleSubmit}>
@@ -248,7 +321,7 @@ function AlunoActive() {
               readOnly={user?.id ? true : false}
             />
 
-
+            <button type="submit">{atividadesParaEditar ? "Editar atividades" : "Criar atividades"}</button>
           </form>
         )}
 
@@ -263,13 +336,24 @@ function AlunoActive() {
               <p>Turma ID: {atividade.turmaId}</p>
               <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
               <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
-
+              <button onClick={() => handleEditaratividades(atividade)}>Editar</button>
+              <button onClick={() => handleRemoveratividades(atividade.id)}>Excluir</button>
             </div>
           ))}
         </div>
       </div>
-    </div >
+
+      {mostrarModalExcluir && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>Tem certeza que deseja excluir essa avaliação?</p>
+            <button onClick={confirmarExclusao}>Sim</button>
+            <button onClick={cancelarExclusao}>Não</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-export default AlunoActive
+export default ProfActive;

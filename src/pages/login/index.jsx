@@ -58,26 +58,6 @@ function Login() {
   }
 
 
-  async function fetchUserAndData() {
-    try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        throw new Error("Usuário não autenticado!");
-      }
-
-      const res = await api.get("/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log("Dados do usuário:", res.data);
-      return res.data;
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error.message);
-    }
-  }
 
 
   return (

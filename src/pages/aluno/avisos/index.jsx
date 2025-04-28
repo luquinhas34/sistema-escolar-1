@@ -2,9 +2,9 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import "../avisos/avisos.css";
 
-function Respaviso() {
+function AlunoAviso() {
     const [avisos, setAvisos] = useState([]);  // Estado de avisos como array
-    0onst[loading, setLoading] = useState(true);  // Estado de carregamento
+    const [loading, setLoading] = useState(true);  // Estado de carregamento
     const [setErro] = useState("");  // Estado de erro
 
     const api = axios.create({
@@ -87,4 +87,4 @@ function Respaviso() {
     );
 }
 
-export default Respaviso;
+export default AlunoAviso;

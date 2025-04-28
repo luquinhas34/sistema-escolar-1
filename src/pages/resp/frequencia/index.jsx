@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
+import "../frequencia/style.css"
 
 
 
 
-const AlunoDiario = () => {
+const Respfrenquencia = () => {
     const [setTurmas] = useState([]);  // Adicionando inicialização de turmas
     const [setAlunos] = useState([]);
     const [selectedTurma] = useState("");
@@ -109,10 +110,10 @@ const AlunoDiario = () => {
     return (
         <div className="container">
             <div className="sidebar">
-                <a href="/resp/dash"><i className="fas fa-home"></i> INICIO</a>
-                <a href="/resp/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/resp/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-                <a href="#" className="active"><i className="fas fa-book"></i> DIÁRIOS</a>
+                <a href="/resp/dash" ><i className="fas fa-home"></i> INICIO</a>
+                <a href="/resp/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/resp/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+                <a href="#" className="active"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
                 <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
@@ -148,4 +149,4 @@ const AlunoDiario = () => {
     );
 };
 
-export default AlunoDiario;
+export default Respfrenquencia;

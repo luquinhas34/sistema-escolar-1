@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
 
-const Aluno = () => {
+const Cood = () => {
   return (
-    <div >
+    <div className="">
       <Outlet />
     </div>
   );
 };
 
-export default Aluno;
+export default Cood;

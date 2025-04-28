@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import "../avisos/avisos.css";
+import "../avisos/style.css";
 
 function Respaviso() {
     const [avisos, setAvisos] = useState([]);  // Estado de avisos como array
-    0onst[loading, setLoading] = useState(true);  // Estado de carregamento
+    const [loading, setLoading] = useState(true);  // Estado de carregamento
     const [setErro] = useState("");  // Estado de erro
 
     const api = axios.create({
@@ -48,10 +48,10 @@ function Respaviso() {
                 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
             />
             <div className="sidebar">
-                <a href="/resp/dash"><i className="fas fa-home"></i> INICIO</a>
-                <a href="/resp/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/resp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-                <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+                <a href="/resp/dash" ><i className="fas fa-home"></i> INICIO</a>
+                <a href="/resp/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/resp/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+                <a href="/resp/frequencia" ><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
                 <a href="#" className="active"><i className="fas fa-bell"></i> AVISOS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>

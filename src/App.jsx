@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./pages/login";
 import Admin from "./pages/adm";
-import Cood from "./pages/cood/index";
 import Diret from "./pages/diret";
 import Admcadastro from "./pages/cadastro";
 
@@ -16,19 +15,19 @@ import Prof from "./pages/prof/Prof";
 import Profaviso from "./pages/prof/avisos";
 import ProfAvaliacoes from "./pages/prof/avaliacoes";
 import DiarioChamada from "./pages/prof/diarios";
-import ChatInicioProf from "./pages/prof/chat.prof/inicio/index";
-import ChatPageProf from "./pages/prof/chat.prof/conversa/ChatPage";
+import ChatInicioProf from "./pages/prof/chat/inicio/index";
+import ChatPageProf from "./pages/prof/chat/conversa/ChatPage";
 // Professor
 
 
 // Responsavel
-import RespActive from "./pages/resp/atividades"
+import RespNotas from "./pages/resp/notas"
 import Resphome from "./pages/resp/dash"
-import Respavaliacoes from "./pages/resp/avaliacoes"
+import RespHorario from "./pages/resp/horario"
 import Respaviso from "./pages/resp/avisos"
-import Respdiario from "./pages/resp/diarios"
-import ChatPagerespinicio from "./pages/resp/chat.resp/inicio"
-import ChatPageresp from "./pages/resp/chat.resp/conversa/ChatPage.jsx"
+import Respfrequencia from "./pages/resp/frequencia"
+import ChatPagerespinicio from "./pages/resp/chat/inicio"
+import ChatPageresp from "./pages/resp/chat/conversa"
 // Responsavel
 
 // Aluno
@@ -38,10 +37,25 @@ import AlunoActive from "./pages/aluno/atividades"
 import AlunoAvali from "./pages/aluno/avaliacoes"
 import AlunoAviso from "./pages/aluno/avisos"
 import AlunoDiario from "./pages/aluno/diarios"
-import Alunochatinicio from "./pages/aluno/chat.resp/inicio"
-import Alunochatconv from "./pages/aluno/chat.resp/conversa"
+import ChatPage from "./pages/aluno/chat/conversa"
+import ChatInicio from "./pages/aluno/chat/inicio"
+
 
 // Aluno
+
+// coordenador
+
+import Cood from "./pages/cood/cood.jsx";
+import CoodDash from "./pages/cood/dash";
+import CoodActive from "./pages/cood/atividades"
+import CoodAvali from "./pages/cood/avaliacoes"
+import CoodAviso from "./pages/cood/avisos"
+import CoodDiario from "./pages/cood/diarios"
+import Coodhora from "./pages/cood/horario"
+import ChatPage1 from "./pages/cood/chat/conversa"
+import ChatInicio1 from "./pages/cood/chat/inicio"
+
+// coordenador
 
 function App() {
   return (
@@ -59,15 +73,29 @@ function App() {
           <Route path="/prof/chat/:id" element={<ChatPageProf />} />
         </Route>
 
+
+
+
+
+
+
         <Route path="/resp" element={<Resp />}>
-          <Route path="atividades" element={<RespActive />} />
+          <Route path="Notas" element={<RespNotas />} />
           <Route path="dash" element={<Resphome />} />
-          <Route path="avaliacoes" element={<Respavaliacoes />} />
+          <Route path="Horario" element={<RespHorario />} />
           <Route path="avisos" element={<Respaviso />} />
-          <Route path="diarios" element={<Respdiario />} />
+          <Route path="frequencia" element={<Respfrequencia />} />
           <Route path="/resp/chat" element={<ChatPagerespinicio />} />
-          <Route path="/resps/chat/:id" element={<ChatPageresp />} />
+          <Route path="/resp/chat/:id" element={<ChatPageresp />} />
         </Route>
+
+
+
+
+
+
+
+
 
         <Route path="/aluno" element={<Aluno />}>
           <Route path="atividades" element={<AlunoActive />} />
@@ -75,13 +103,33 @@ function App() {
           <Route path="avaliacoes" element={<AlunoAvali />} />
           <Route path="avisos" element={<AlunoAviso />} />
           <Route path="diarios" element={<AlunoDiario />} />
-          <Route path="/resp/chat" element={<Alunochatinicio />} />
-          <Route path="/resps/chat/:id" element={<Alunochatconv />} />
+          <Route path="/aluno/chat" element={<ChatInicio />} />
+          <Route path="/aluno/chat/:id" element={<ChatPage />} />
+        </Route>
+
+
+
+
+
+
+
+
+
+
+        <Route path="/cood" element={<Cood />}>
+          <Route path="atividades" element={<CoodActive />} />
+          <Route path="dash" element={<CoodDash />} />
+          <Route path="avaliacoes" element={<CoodAvali />} />
+          <Route path="avisos" element={<CoodAviso />} />
+          <Route path="diarios" element={<CoodDiario />} />
+          <Route path="horario" element={<Coodhora />} />
+          <Route path="/cood/chat" element={<ChatInicio1 />} />
+          <Route path="/cood/chat/:id" element={<ChatPage1 />} />
+
         </Route>
 
 
         <Route path="/Admin" element={<Admin />} />
-        <Route path="/Cood" element={<Cood />} />
         <Route path="/Diret" element={<Diret />} />
 
         <Route path="/aluno" element={<Aluno />}>
