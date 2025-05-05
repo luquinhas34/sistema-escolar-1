@@ -74,6 +74,7 @@ function Profhome() {
         <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
         <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
+        <a href="/cood/alunos"><i className="fa-circle-user"></i> FREQUÊNCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="main-content">
