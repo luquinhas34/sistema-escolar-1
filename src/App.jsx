@@ -54,6 +54,8 @@ import CoodDiario from "./pages/cood/diarios"
 import Coodhora from "./pages/cood/horario"
 import ChatPage1 from "./pages/cood/chat/conversa"
 import ChatInicio1 from "./pages/cood/chat/inicio"
+import CadastroAluno from "./pages/cood/alunos"
+import CadastroProfessor from "./pages/cood/professor"
 
 // coordenador
 
@@ -123,6 +125,8 @@ function App() {
           <Route path="avisos" element={<CoodAviso />} />
           <Route path="diarios" element={<CoodDiario />} />
           <Route path="horario" element={<Coodhora />} />
+          <Route path="/cood/aluno" element={<CadastroAluno />} />
+          <Route path="/cood/professor" element={<CadastroProfessor />} />
           <Route path="/cood/chat" element={<ChatInicio1 />} />
           <Route path="/cood/chat/:id" element={<ChatPage1 />} />
 

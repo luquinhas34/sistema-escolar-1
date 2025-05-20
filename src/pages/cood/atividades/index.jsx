@@ -205,14 +205,16 @@ function ProfActive() {
   return (
     <div className="container">
       <div className="sidebar">
-        <a href="/cood/dash"><i className="fas fa-home"></i> INICIO</a>
-        <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/cood/dash" ><i className="fas fa-home"></i> INICIO</a>
+        <a href="/cood/atividades" className="active" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
         <a href="/cood/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
         <a href="/cood/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
         <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
         <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
+        <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>
+        <a href="/cood/aluno"><i className="fa-circle-user" ></i> AD ALUNOS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 

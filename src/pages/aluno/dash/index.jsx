@@ -67,10 +67,10 @@ function AlunoDash() {
       />
       <div className="sidebar">
         <a href="#" className="active"><i className="fas fa-home"></i> INICIO</a>
-        <a href="/resp/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/resp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/resp/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
-        <a href="/resp/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/aluno/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/ralunoesp/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/aluno/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/aluno/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="main-content">
