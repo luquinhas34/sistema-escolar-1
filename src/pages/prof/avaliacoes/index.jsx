@@ -210,8 +210,9 @@ function ProfAvaliacoes() {
         <a href="/prof/dash"><i className="fas fa-home"></i> INICIO</a>
         <a href="/prof/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
         <a href="#" className="active"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/prof/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="/prof/notas"><i className="fas fa-book"></i> NOTAS</a>
         <a href="/prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/prof/frequencia"><i className="fas fa-bell"></i> FREQUENCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 

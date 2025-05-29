@@ -1,0 +1,96 @@
+.calendario-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: auto;
+}
+
+.calendario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendario-header select {
+  padding: 5px;
+}
+
+.calendario-header button {
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+
+.dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #f0f0f0;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 0;
+}
+
+.dia-semana {
+  padding: 10px 0;
+}
+
+.dias-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: #ccc;
+}
+
+.dia-celula {
+  background-color: #fff;
+  min-height: 80px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 12px;
+  position: relative;
+}
+
+.numero-dia {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.evento {
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-bottom: 2px;
+  font-size: 10px;
+  color: white;
+  text-transform: capitalize;
+}
+
+.green {
+  background-color: green;
+}
+.red {
+  background-color: red;
+}
+.orange {
+  background-color: orange;
+}
+.purple {
+  background-color: purple;
+}
+
+.legenda-eventos {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 14px;
+}
+
+.legenda-eventos .box {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 5px;
+  border-radius: 2px;
+}

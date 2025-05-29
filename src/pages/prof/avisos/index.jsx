@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+
 import axios from "axios";
 import { useState, useEffect } from "react";
 import "../avisos/avisos.css";
@@ -110,24 +110,13 @@ function Profaviso() {
                 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
             />
             <div className="sidebar">
-                <Link to="/prof/dash" >
-                    <i className="fas fa-home"></i> INICIO
-                </Link>
-                <Link to="/prof/atividades">
-                    <i className="fas fa-tasks"></i> ATIVIDADES
-                </Link>
-                <Link to="/prof/avaliacoes">
-                    <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
-                </Link>
-                <Link to="/prof/diarios">
-                    <i className="fas fa-book"></i> DIÁRIOS
-                </Link>
-                <Link to="/prof/avisos" className="active">
-                    <i className="fas fa-bell"></i> AVISOS
-                </Link>
-                <Link to="/">
-                    <i className="fas fa-sign-out-alt"></i> SAIR
-                </Link>
+                <a href="/prof/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/prof/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/prof/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/prof/notas"><i className="fas fa-book"></i> NOTAS</a>
+                <a href="#" className="active"><i className="fas fa-bell"></i> AVISOS</a>
+                <a href="/prof/frequencia"><i className="fas fa-bell"></i> FREQUENCIA</a>
+                <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
             <div className="main-content">
                 <div className="header">

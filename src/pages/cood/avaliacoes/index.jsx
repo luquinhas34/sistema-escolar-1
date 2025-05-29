@@ -214,6 +214,7 @@ function ProfAvaliacoes() {
         <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
         <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
+        <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>        
         <a href="/cood/aluno"><i className="fa-circle-user" ></i> AD ALUNOS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
