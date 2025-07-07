@@ -76,6 +76,7 @@ function Profhome() {
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>
         <a href="/cood/aluno"><i className="fa-circle-user" ></i> AD ALUNOS</a>
+        <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="main-content">

@@ -16,8 +16,6 @@ import Profaviso from "./pages/prof/avisos";
 import ProfAvaliacoes from "./pages/prof/avaliacoes";
 import Notasprof from "./pages/prof/notas";
 import Freqprof from "./pages/prof/frequencia";
-import ChatInicioProf from "./pages/prof/chat/inicio/index";
-import ChatPageProf from "./pages/prof/chat/conversa/ChatPage";
 // Professor
 
 
@@ -27,8 +25,6 @@ import Resphome from "./pages/resp/dash"
 import RespHorario from "./pages/resp/horario"
 import Respaviso from "./pages/resp/avisos"
 import Respfrequencia from "./pages/resp/frequencia"
-import ChatPagerespinicio from "./pages/resp/chat/inicio"
-import ChatPageresp from "./pages/resp/chat/conversa"
 // Responsavel
 
 // Aluno
@@ -38,8 +34,6 @@ import AlunoActive from "./pages/aluno/atividades"
 import AlunoAvali from "./pages/aluno/avaliacoes"
 import AlunoAviso from "./pages/aluno/avisos"
 import AlunoDiario from "./pages/aluno/diarios"
-import ChatPage from "./pages/aluno/chat/conversa"
-import ChatInicio from "./pages/aluno/chat/inicio"
 
 
 // Aluno
@@ -52,12 +46,11 @@ import CoodActive from "./pages/cood/atividades"
 import CoodAvali from "./pages/cood/avaliacoes"
 import CoodAviso from "./pages/cood/avisos"
 import CoodDiario from "./pages/cood/diarios"
-import Coodhora from "./pages/cood/horario"
-import ChatPage1 from "./pages/cood/chat/conversa"
-import ChatInicio1 from "./pages/cood/chat/inicio"
 import CadastroAluno from "./pages/cood/alunos"
 import CadastroProfessor from "./pages/cood/professor"
-import CalendarioPage from "./pages/cood/calendario"
+import Frequenciacood from "./pages/cood/frequencia"
+import TurmasCood from "./pages/cood/turmas"
+import NotasCodd from "./pages/cood/notas"
 
 // coordenador
 
@@ -74,8 +67,6 @@ function App() {
           <Route path="avisos" element={<Profaviso />} />
           <Route path="notas" element={<Notasprof />} />
           <Route path="frequencia" element={<Freqprof />} />
-          <Route path="/prof/chat" element={<ChatInicioProf />} />
-          <Route path="/prof/chat/:id" element={<ChatPageProf />} />
         </Route>
 
 
@@ -90,8 +81,6 @@ function App() {
           <Route path="Horario" element={<RespHorario />} />
           <Route path="avisos" element={<Respaviso />} />
           <Route path="frequencia" element={<Respfrequencia />} />
-          <Route path="/resp/chat" element={<ChatPagerespinicio />} />
-          <Route path="/resp/chat/:id" element={<ChatPageresp />} />
         </Route>
 
 
@@ -108,8 +97,6 @@ function App() {
           <Route path="avaliacoes" element={<AlunoAvali />} />
           <Route path="avisos" element={<AlunoAviso />} />
           <Route path="diarios" element={<AlunoDiario />} />
-          <Route path="/aluno/chat" element={<ChatInicio />} />
-          <Route path="/aluno/chat/:id" element={<ChatPage />} />
         </Route>
 
 
@@ -127,12 +114,12 @@ function App() {
           <Route path="avaliacoes" element={<CoodAvali />} />
           <Route path="avisos" element={<CoodAviso />} />
           <Route path="diarios" element={<CoodDiario />} />
-          <Route path="horario" element={<Coodhora />} />
           <Route path="/cood/aluno" element={<CadastroAluno />} />
           <Route path="/cood/professor" element={<CadastroProfessor />} />
-          <Route path="/cood/chat" element={<ChatInicio1 />} />
-          <Route path="/cood/chat/:id" element={<ChatPage1 />} />
-          <Route path="/cood/calendario" element={<CalendarioPage />} />
+
+          <Route path="/cood/frequencia" element={<Frequenciacood />} />
+          <Route path="/cood/Turmas" element={<TurmasCood />} />
+          <Route path="/cood/Notas" element={<NotasCodd />} />
         </Route>
 
 

@@ -9,10 +9,11 @@ function ProfAvaliacoes() {
     descricao: "",
     dataInicio: "",
     dataFim: "",
-    turmaId: "",
-    userId: "",
+    turmaIdt: 0,   // ou null, mas zero para indicar "não selecionado"
+    userId: 0,     // preenchido depois do useEffect
     documento: null,
   });
+
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [avaliacoes, setAvaliacoes] = useState([]);
@@ -40,24 +41,33 @@ function ProfAvaliacoes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Dados a serem enviados:", formData);
-    // Verificar se todos os campos obrigatórios estão preenchidos
-    if (!formData.titulo || !formData.descricao || !formData.dataInicio ||
-      !formData.dataFim || !formData.turmaId || !formData.userId) {
-      setErro("Todos os campos são obrigatórios.");
+
+
+    // Verificações adicionais
+    const turmaIdtNum = Number(formData.turmaIdt);
+    const userIdNum = Number(formData.userId);
+
+    if (
+      !formData.titulo ||
+      !formData.descricao ||
+      !formData.dataInicio ||
+      !formData.dataFim ||
+      isNaN(turmaIdtNum) ||
+      isNaN(userIdNum)
+    ) {
+      setErro("Todos os campos são obrigatórios e válidos.");
       return;
     }
 
     const data = new FormData();
 
-    // Adicionar cada campo ao FormData
     data.append("titulo", formData.titulo);
     data.append("descricao", formData.descricao);
     data.append("dataInicio", formData.dataInicio);
     data.append("dataFim", formData.dataFim);
-    data.append("turmaId", formData.turmaId);
-    data.append("userId", formData.userId);
+    data.append("turmaIdt", turmaIdtNum);
+    data.append("userId", userIdNum);
 
-    // Adicionar documento apenas se existir
     if (formData.documento) {
       data.append("documento", formData.documento);
     }
@@ -65,7 +75,6 @@ function ProfAvaliacoes() {
     try {
       const token = localStorage.getItem("token");
 
-      // Usar a API configurada em vez de axios diretamente para manter consistência
       const response = await api.post("/api/avaliacoes", data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -80,8 +89,8 @@ function ProfAvaliacoes() {
         descricao: "",
         dataInicio: "",
         dataFim: "",
-        turmaId: "",
-        userId: "",
+        turmaIdt: "",
+        userId: userIdNum,
         documento: null,
       });
       setSelectedTurma("");
@@ -89,14 +98,14 @@ function ProfAvaliacoes() {
       buscarAvaliacoes();
     } catch (error) {
       console.error("Erro ao criar avaliação:", error);
-      // Exibir mensagem mais detalhada do erro
-      if (error.response && error.response.data && error.response.data.message) {
+      if (error.response?.data?.message) {
         setErro(`Erro: ${error.response.data.message}`);
       } else {
-        setErro("Erro ao criar avaliação. Verifique se todos os campos estão preenchidos corretamente.");
+        setErro("Erro ao criar avaliação. Verifique os campos.");
       }
     }
   };
+
 
   // Renomeada para manter consistência
   const buscarAvaliacoes = async () => {
@@ -115,20 +124,25 @@ function ProfAvaliacoes() {
   };
 
   const handleEditaravaliacoes = (avaliacao) => {
-    setAvaliacoesParaEditar(avaliacao);
-    // Formatando as datas para o formato esperado pelo input datetime-local
     const dataInicio = avaliacao.dataInicio ? new Date(avaliacao.dataInicio).toISOString().slice(0, 16) : "";
     const dataFim = avaliacao.dataFim ? new Date(avaliacao.dataFim).toISOString().slice(0, 16) : "";
 
     setFormData({
-      ...avaliacao,
+      id: avaliacao.id,
+      titulo: avaliacao.titulo,
+      descricao: avaliacao.descricao,
       dataInicio,
       dataFim,
+      turmaIdt: avaliacao.turmaIdt,
+      userId: avaliacao.userId,
       documento: null,
     });
-    setSelectedTurma(avaliacao.turmaId);
+    setSelectedTurma(avaliacao.turmaIdt);
+    setAvaliacoesParaEditar(avaliacao);
     setMostrarFormulario(true);
   };
+
+
 
   const handleRemoveravaliacoes = (id) => {
     setIdParaExcluir(id);
@@ -196,12 +210,22 @@ function ProfAvaliacoes() {
   }, [mensagem, erro]);
 
   const handleTurmaChange = (e) => {
-    setSelectedTurma(e.target.value);
-    setFormData((prevData) => ({
-      ...prevData,
-      turmaId: e.target.value,
+    const value = e.target.value;
+
+    setSelectedTurma(value);
+
+    // Aqui garantimos que apenas valores numéricos válidos sejam aplicados
+    const turmaIdConvertido = value !== "" && !isNaN(Number(value)) ? Number(value) : "";
+
+    setFormData((prev) => ({
+      ...prev,
+      turmaIdt: turmaIdConvertido,
     }));
   };
+
+
+
+
 
   return (
     <div className="container">
@@ -214,8 +238,9 @@ function ProfAvaliacoes() {
         <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
         <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>        
+        <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>
         <a href="/cood/aluno"><i className="fa-circle-user" ></i> AD ALUNOS</a>
+        <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
@@ -246,7 +271,7 @@ function ProfAvaliacoes() {
                   descricao: "",
                   dataInicio: "",
                   dataFim: "",
-                  turmaId: "",
+                  turmaIdt: "",
                   userId: user?.id || "",
                   documento: null,
                 });
@@ -285,9 +310,12 @@ function ProfAvaliacoes() {
               >
                 <option value="">Selecione uma turma</option>
                 {turmas.map((turma) => (
-                  <option key={turma.id} value={turma.id}>
-                    {turma.nome}
+                  <option key={turma.idt} value={turma.idt}>
+                    {turma.nome} (ID {turma.idt})
                   </option>
+
+
+
                 ))}
               </select>
             </label>
@@ -324,7 +352,10 @@ function ProfAvaliacoes() {
               readOnly={user?.id ? true : false}
             />
 
-            <button type="submit">{avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
+            <button type="submit">
+              {avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}
+            </button>
+
           </form>
         )}
 
@@ -336,7 +367,7 @@ function ProfAvaliacoes() {
             <div key={avaliacao.id} className="atividade-item">
               <h3>{avaliacao.titulo}</h3>
               <p>{avaliacao.descricao}</p>
-              <p>Turma ID: {avaliacao.turmaId}</p>
+              <p>Turma ID: {avaliacao.turmaIdt}</p>
               <p>Data Início: {new Date(avaliacao.dataInicio).toLocaleString()}</p>
               <p>Data Fim: {new Date(avaliacao.dataFim).toLocaleString()}</p>
               <button onClick={() => handleEditaravaliacoes(avaliacao)}>Editar</button>

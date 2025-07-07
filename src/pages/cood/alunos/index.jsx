@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import "../css/css_principal.css"
 
 export default function CadastroAluno() {
     const [form, setForm] = useState({
@@ -34,7 +35,7 @@ export default function CadastroAluno() {
                 name: "",
                 email: "",
                 password: "",
-                role: "aluno",
+                role: "aluno_vall",
                 cpf: "",
                 telefone: "",
                 dataNascimento: "",
@@ -61,6 +62,7 @@ export default function CadastroAluno() {
                 <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
                 <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>
                 <a href="#" className="active"><i className="fa-circle-user" ></i> AD ALUNOS</a>
+                <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
             <div className="header">

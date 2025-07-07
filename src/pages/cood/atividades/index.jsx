@@ -2,19 +2,21 @@ import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "../atividades/style.css";
 
-function ProfActive() {
+
+function CoodActive() {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
     dataInicio: "",
     dataFim: "",
-    turmaId: "",
-    userId: "",
+    turmaIdt: 0,   // ou null, mas zero para indicar "não selecionado"
+    userId: 0,     // preenchido depois do useEffect
     documento: null,
   });
 
+
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [atividades, setAtividade] = useState([]);
+  const [atividades, setAtividades] = useState([]);
   const [atividadesParaEditar, setAtividadesParaEditar] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
@@ -39,24 +41,32 @@ function ProfActive() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Dados a serem enviados:", formData);
-    // Verificar se todos os campos obrigatórios estão preenchidos
-    if (!formData.titulo || !formData.descricao || !formData.dataInicio ||
-      !formData.dataFim || !formData.turmaId || !formData.userId) {
-      setErro("Todos os campos são obrigatórios.");
+
+    // Verificações adicionais
+    const turmaIdtNum = Number(formData.turmaIdt);
+    const userIdNum = Number(formData.userId);
+
+    if (
+      !formData.titulo ||
+      !formData.descricao ||
+      !formData.dataInicio ||
+      !formData.dataFim ||
+      isNaN(turmaIdtNum) ||
+      isNaN(userIdNum)
+    ) {
+      setErro("Todos os campos são obrigatórios e válidos.");
       return;
     }
 
     const data = new FormData();
 
-    // Adicionar cada campo ao FormData
     data.append("titulo", formData.titulo);
     data.append("descricao", formData.descricao);
     data.append("dataInicio", formData.dataInicio);
     data.append("dataFim", formData.dataFim);
-    data.append("turmaId", formData.turmaId);
-    data.append("userId", formData.userId);
+    data.append("turmaIdt", turmaIdtNum);
+    data.append("userId", userIdNum);
 
-    // Adicionar documento apenas se existir
     if (formData.documento) {
       data.append("documento", formData.documento);
     }
@@ -64,7 +74,6 @@ function ProfActive() {
     try {
       const token = localStorage.getItem("token");
 
-      // Usar a API configurada em vez de axios diretamente para manter consistência
       const response = await api.post("/api/atividades", data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -72,30 +81,30 @@ function ProfActive() {
         },
       });
 
-      setMensagem(response.data.message || "Atividade criada com sucesso!");
+      setMensagem(response.data.message || "Avaliação criada com sucesso!");
       setErro("");
       setFormData({
         titulo: "",
         descricao: "",
         dataInicio: "",
         dataFim: "",
-        turmaId: "",
-        userId: "",
+        turmaIdt: "",
+        userId: userIdNum,
         documento: null,
       });
       setSelectedTurma("");
       setMostrarFormulario(false);
       buscarAtividades();
     } catch (error) {
-      console.error("Erro ao criar atividade:", error);
-      // Exibir mensagem mais detalhada do erro
-      if (error.response && error.response.data && error.response.data.message) {
+      console.error("Erro ao criar avaliação:", error);
+      if (error.response?.data?.message) {
         setErro(`Erro: ${error.response.data.message}`);
       } else {
-        setErro("Erro ao criar atividade. Verifique se todos os campos estão preenchidos corretamente.");
+        setErro("Erro ao criar avaliação. Verifique os campos.");
       }
     }
   };
+
 
   // Renomeada para manter consistência
   const buscarAtividades = async () => {
@@ -106,28 +115,33 @@ function ProfActive() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setAtividade(response.data);
+      setAtividades(response.data);
     } catch (error) {
-      console.error('Erro ao criar atividade:', error);
+      console.error('Erro ao criar avaliação:', error);
       console.log('Resposta do servidor:', error.response?.data);
     }
   };
 
   const handleEditaratividades = (atividade) => {
-    setAtividadesParaEditar(atividade);
     // Formatando as datas para o formato esperado pelo input datetime-local
     const dataInicio = atividade.dataInicio ? new Date(atividade.dataInicio).toISOString().slice(0, 16) : "";
     const dataFim = atividade.dataFim ? new Date(atividade.dataFim).toISOString().slice(0, 16) : "";
 
+    // Procurar a turma pelo nome que está em atividade.turmaIdt
+    const turmaSelecionada = turmas.find(t => t.nome === atividade.turmaIdt);
+    const turmaIdtNumerico = turmaSelecionada ? turmaSelecionada.id : "";
+
     setFormData({
       ...atividade,
+      turmaIdt: turmaIdtNumerico,
       dataInicio,
       dataFim,
       documento: null,
     });
-    setSelectedTurma(atividade.turmaId);
+    setSelectedTurma(turmaIdtNumerico);
     setMostrarFormulario(true);
   };
+
 
   const handleRemoveratividades = (id) => {
     setIdParaExcluir(id);
@@ -142,12 +156,12 @@ function ProfActive() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setMensagem("Atividades excluída com sucesso!");
+      setMensagem("Avaliação excluída com sucesso!");
       setErro("");
       buscarAtividades();
     } catch (error) {
-      console.error("Erro ao excluir atividades:", error);
-      setErro("Erro ao excluir atividades.");
+      console.error("Erro ao excluir avaliações:", error);
+      setErro("Erro ao excluir avaliações.");
     } finally {
       setMostrarModalExcluir(false);
       setIdParaExcluir(null);
@@ -195,19 +209,29 @@ function ProfActive() {
   }, [mensagem, erro]);
 
   const handleTurmaChange = (e) => {
-    setSelectedTurma(e.target.value);
-    setFormData((prevData) => ({
-      ...prevData,
-      turmaId: e.target.value,
+    const value = e.target.value;
+
+    setSelectedTurma(value);
+
+    // Aqui garantimos que apenas valores numéricos válidos sejam aplicados
+    const turmaIdConvertido = value !== "" && !isNaN(Number(value)) ? Number(value) : "";
+
+    setFormData((prev) => ({
+      ...prev,
+      turmaIdt: turmaIdConvertido,
     }));
   };
+
+
+
+
 
   return (
     <div className="container">
       <div className="sidebar">
         <a href="/cood/dash" ><i className="fas fa-home"></i> INICIO</a>
-        <a href="/cood/atividades" className="active" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/cood/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="#" className="active" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/cood/avaliacoes"  ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
         <a href="/cood/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
         <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
@@ -215,6 +239,7 @@ function ProfActive() {
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>
         <a href="/cood/aluno"><i className="fa-circle-user" ></i> AD ALUNOS</a>
+        <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
@@ -245,7 +270,7 @@ function ProfActive() {
                   descricao: "",
                   dataInicio: "",
                   dataFim: "",
-                  turmaId: "",
+                  turmaIdt: "",
                   userId: user?.id || "",
                   documento: null,
                 });
@@ -284,9 +309,10 @@ function ProfActive() {
               >
                 <option value="">Selecione uma turma</option>
                 {turmas.map((turma) => (
-                  <option key={turma.id} value={turma.id}>
+                  <option key={turma.idt} value={turma.idt}>
                     {turma.nome}
                   </option>
+
                 ))}
               </select>
             </label>
@@ -323,7 +349,7 @@ function ProfActive() {
               readOnly={user?.id ? true : false}
             />
 
-            <button type="submit">{atividadesParaEditar ? "Editar atividades" : "Criar atividades"}</button>
+            <button type="submit">{atividadesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
           </form>
         )}
 
@@ -335,7 +361,7 @@ function ProfActive() {
             <div key={atividade.id} className="atividade-item">
               <h3>{atividade.titulo}</h3>
               <p>{atividade.descricao}</p>
-              <p>Turma ID: {atividade.turmaId}</p>
+              <p>Turma ID: {atividade.turmaIdt}</p>
               <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
               <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
               <button onClick={() => handleEditaratividades(atividade)}>Editar</button>
@@ -358,4 +384,4 @@ function ProfActive() {
   );
 }
 
-export default ProfActive;
+export default CoodActive;
