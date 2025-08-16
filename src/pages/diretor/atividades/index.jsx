@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-import "../avaliacoes/style.css";
+import "../atividades/style.css";
 
 
-function ProfAvaliacoes() {
+function DiretActive() {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -16,8 +16,8 @@ function ProfAvaliacoes() {
 
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [avaliacoes, setAvaliacoes] = useState([]);
-  const [avaliacoesParaEditar, setAvaliacoesParaEditar] = useState(null);
+  const [atividades, setAtividades] = useState([]);
+  const [atividadesParaEditar, setAtividadesParaEditar] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
@@ -41,7 +41,6 @@ function ProfAvaliacoes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Dados a serem enviados:", formData);
-
 
     // Verificações adicionais
     const turmaIdtNum = Number(formData.turmaIdt);
@@ -75,7 +74,7 @@ function ProfAvaliacoes() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await api.post("/api/avaliacoes", data, {
+      const response = await api.post("/api/atividades", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -95,7 +94,7 @@ function ProfAvaliacoes() {
       });
       setSelectedTurma("");
       setMostrarFormulario(false);
-      buscarAvaliacoes();
+      buscarAtividades();
     } catch (error) {
       console.error("Erro ao criar avaliação:", error);
       if (error.response?.data?.message) {
@@ -108,43 +107,43 @@ function ProfAvaliacoes() {
 
 
   // Renomeada para manter consistência
-  const buscarAvaliacoes = async () => {
+  const buscarAtividades = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await api.get("/api/avaliacoes", {
+      const response = await api.get("/api/atividades", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setAvaliacoes(response.data);
+      setAtividades(response.data);
     } catch (error) {
       console.error('Erro ao criar avaliação:', error);
       console.log('Resposta do servidor:', error.response?.data);
     }
   };
 
-  const handleEditaravaliacoes = (avaliacao) => {
-    const dataInicio = avaliacao.dataInicio ? new Date(avaliacao.dataInicio).toISOString().slice(0, 16) : "";
-    const dataFim = avaliacao.dataFim ? new Date(avaliacao.dataFim).toISOString().slice(0, 16) : "";
+  const handleEditaratividades = (atividade) => {
+    // Formatando as datas para o formato esperado pelo input datetime-local
+    const dataInicio = atividade.dataInicio ? new Date(atividade.dataInicio).toISOString().slice(0, 16) : "";
+    const dataFim = atividade.dataFim ? new Date(atividade.dataFim).toISOString().slice(0, 16) : "";
+
+    // Procurar a turma pelo nome que está em atividade.turmaIdt
+    const turmaSelecionada = turmas.find(t => t.nome === atividade.turmaIdt);
+    const turmaIdtNumerico = turmaSelecionada ? turmaSelecionada.id : "";
 
     setFormData({
-      id: avaliacao.id,
-      titulo: avaliacao.titulo,
-      descricao: avaliacao.descricao,
+      ...atividade,
+      turmaIdt: turmaIdtNumerico,
       dataInicio,
       dataFim,
-      turmaIdt: avaliacao.turmaIdt,
-      userId: avaliacao.userId,
       documento: null,
     });
-    setSelectedTurma(avaliacao.turmaIdt);
-    setAvaliacoesParaEditar(avaliacao);
+    setSelectedTurma(turmaIdtNumerico);
     setMostrarFormulario(true);
   };
 
 
-
-  const handleRemoveravaliacoes = (id) => {
+  const handleRemoveratividades = (id) => {
     setIdParaExcluir(id);
     setMostrarModalExcluir(true);
   };
@@ -152,14 +151,14 @@ function ProfAvaliacoes() {
   const confirmarExclusao = async () => {
     try {
       const token = localStorage.getItem("token");
-      await api.delete(`/api/avaliacoes/${idParaExcluir}`, {
+      await api.delete(`/api/atividades/${idParaExcluir}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setMensagem("Avaliação excluída com sucesso!");
       setErro("");
-      buscarAvaliacoes();
+      buscarAtividades();
     } catch (error) {
       console.error("Erro ao excluir avaliações:", error);
       setErro("Erro ao excluir avaliações.");
@@ -195,7 +194,7 @@ function ProfAvaliacoes() {
     }
 
     buscarTurmas();
-    buscarAvaliacoes();
+    buscarAtividades();
   }, []);
 
   useEffect(() => {
@@ -230,16 +229,16 @@ function ProfAvaliacoes() {
   return (
     <div className="centro">
       <div className="sidebar">
-        <a href="/cood/dash" ><i className="fas fa-home"></i> INICIO</a>
-        <a href="/cood/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="#" className="active"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-        <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-        <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
-        <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/cood/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-        <a href="/cood/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
-        <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
+        <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
+        <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/diret/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
+        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
+        <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
+        <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="content">
@@ -248,7 +247,7 @@ function ProfAvaliacoes() {
             Olá, Bem-vindo <strong>Carlos Pereira</strong>
           </div>
           <div className="icons">
-            <a href="/cood/chat" className="active"><i className="fas fa-envelope"></i></a>
+            <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user">
               <i className="fas fa-user-circle"></i>
             </div>
@@ -260,8 +259,8 @@ function ProfAvaliacoes() {
             type="button"
             className="add-button"
             onClick={() => {
-              if (mostrarFormulario && avaliacoesParaEditar) {
-                setAvaliacoesParaEditar(null);
+              if (mostrarFormulario && atividadesParaEditar) {
+                setAtividadesParaEditar(null);
               }
               setMostrarFormulario(!mostrarFormulario);
               if (mostrarFormulario) {
@@ -279,7 +278,7 @@ function ProfAvaliacoes() {
               }
             }}
           >
-            {avaliacoesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
+            {atividadesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
           </button>
         </div>
 
@@ -311,10 +310,8 @@ function ProfAvaliacoes() {
                 <option value="">Selecione uma turma</option>
                 {turmas.map((turma) => (
                   <option key={turma.idt} value={turma.idt}>
-                    {turma.nome} (ID {turma.idt})
+                    {turma.nome}
                   </option>
-
-
 
                 ))}
               </select>
@@ -352,10 +349,7 @@ function ProfAvaliacoes() {
               readOnly={user?.id ? true : false}
             />
 
-            <button type="submit">
-              {avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}
-            </button>
-
+            <button type="submit">{atividadesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
           </form>
         )}
 
@@ -363,15 +357,15 @@ function ProfAvaliacoes() {
         {mensagem && <div className="success">{mensagem}</div>}
 
         <div className="atividade-list">
-          {avaliacoes.map((avaliacao) => (
-            <div key={avaliacao.id} className="atividade-item">
-              <h3>{avaliacao.titulo}</h3>
-              <p>{avaliacao.descricao}</p>
-              <p>Turma ID: {avaliacao.turmaIdt}</p>
-              <p>Data Início: {new Date(avaliacao.dataInicio).toLocaleString()}</p>
-              <p>Data Fim: {new Date(avaliacao.dataFim).toLocaleString()}</p>
-              <button onClick={() => handleEditaravaliacoes(avaliacao)}>Editar</button>
-              <button onClick={() => handleRemoveravaliacoes(avaliacao.id)}>Excluir</button>
+          {atividades.map((atividade) => (
+            <div key={atividade.id} className="atividade-item">
+              <h3>{atividade.titulo}</h3>
+              <p>{atividade.descricao}</p>
+              <p>Turma ID: {atividade.turmaIdt}</p>
+              <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
+              <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
+              <button onClick={() => handleEditaratividades(atividade)}>Editar</button>
+              <button onClick={() => handleRemoveratividades(atividade.id)}>Excluir</button>
             </div>
           ))}
         </div>
@@ -390,4 +384,4 @@ function ProfAvaliacoes() {
   );
 }
 
-export default ProfAvaliacoes;
+export default DiretActive;

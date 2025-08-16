@@ -1,0 +1,116 @@
+.turmas-page {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f8f8fc;
+}
+
+.turmas-nova {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.turmas-input {
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 300px;
+  font-size: 1rem;
+}
+
+.turmas-add-btn {
+  background-color: #7e57c2;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.turmas-lista-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.turmas-botao {
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+.turmas-botao.ativa {
+  background-color: #7e57c2;
+  color: #fff;
+}
+
+.turmas-painel {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.turmas-lista {
+  list-style: none;
+  padding: 0;
+}
+
+.turmas-item {
+  display: flex;
+  justify-content: space-between;
+  background: #f1f1f9;
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.btn-remover {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.turmas-add-aluno {
+  margin-top: 2rem;
+}
+
+.turmas-sugestoes {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sugestao-aluno {
+  background: #ede7f6;
+  border: 1px solid #b39ddb;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.turmas-info {
+  color: #777;
+}
+
+.turmas-mensagem {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+}

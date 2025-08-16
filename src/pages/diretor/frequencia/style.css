@@ -1,0 +1,83 @@
+.frequencia-label {
+  font-weight: bold;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.frequencia-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+.frequencia-btn {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #eee;
+  color: #333;
+}
+
+.frequencia-btn.btn-presente {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.frequencia-btn.btn-falta {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.frequencia-btn-salvar {
+  margin-top: 30px;
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  background-color: #7c52ff;
+  cursor: pointer;
+}
+
+.frequencia-btn-salvar:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.frequencia-subtitle {
+  margin-bottom: 12px;
+  margin-top: 20px;
+  color: #333;
+  font-size: 20px;
+}
+
+.frequencia-aluno-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.frequencia-card {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  width: fit-content;
+}

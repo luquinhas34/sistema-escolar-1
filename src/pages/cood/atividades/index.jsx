@@ -227,30 +227,30 @@ function CoodActive() {
 
 
   return (
-    <div className="container">
+    <div className="centro">
       <div className="sidebar">
         <a href="/cood/dash" ><i className="fas fa-home"></i> INICIO</a>
-        <a href="#" className="active" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/cood/avaliacoes"  ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/cood/diarios"><i className="fas fa-book"></i> DIÁRIOS</a>
+        <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/cood/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
         <a href="/cood/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="/cood/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
         <a href="/cood/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/cood/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/cood/professor"><i className="fa-circle-user" ></i> AD PROFESSOR</a>
-        <a href="/cood/aluno"><i className="fa-circle-user" ></i> AD ALUNOS</a>
+        <a href="/cood/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
+        <a href="/cood/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
         <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
-
-      <div className="main-content">
+      <div className="content">
         <div className="header">
           <div className="welcome">
-            Olá, Bem-vindo <strong><h1>{user?.name || "Usuário"}</h1></strong>
+            Olá, Bem-vindo <strong>Carlos Pereira</strong>
           </div>
           <div className="icons">
             <a href="/cood/chat" className="active"><i className="fas fa-envelope"></i></a>
-            <div className="user"><i className="fas fa-user-circle"></i></div>
+            <div className="user">
+              <i className="fas fa-user-circle"></i>
+            </div>
           </div>
         </div>
 
