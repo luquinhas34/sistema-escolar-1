@@ -3,7 +3,17 @@ import Calendar from "react-calendar";
 import api from "../../../services/api";
 import "../frequencia/style.css";
 
-function DiretFrequencia() {
+// Helper para pegar usuário do localStorage (mesmo do CadastroAluno)
+function getStoredUser() {
+    try {
+        const raw = localStorage.getItem("user");
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+
+export default function DiretFrequencia() {
     const [turmas, setTurmas] = useState([]);
     const [alunos, setAlunos] = useState([]);
     const [selectedData, setSelectedData] = useState(null);
@@ -15,20 +25,25 @@ function DiretFrequencia() {
     const [salvando, setSalvando] = useState(false);
     const [userIdInput, setUserIdInput] = useState("");
 
+    // pega o usuário logado
+    const user = getStoredUser();
+    const nomeUsuario = user?.nome || user?.name || "Usuário";
+
     useEffect(() => {
-        const carregarTurmas = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const res = await api.get("/api/turmas", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setTurmas(res.data);
-            } catch {
-                alert("Erro ao carregar turmas");
-            }
-        };
         carregarTurmas();
     }, []);
+
+    async function carregarTurmas() {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await api.get("/api/turmas", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setTurmas(res.data);
+        } catch {
+            alert("Erro ao carregar turmas");
+        }
+    }
 
     useEffect(() => {
         if (selectedData && selectedTurma) {
@@ -40,7 +55,7 @@ function DiretFrequencia() {
         }
     }, [selectedData, selectedTurma]);
 
-    const buscarAlunos = async () => {
+    async function buscarAlunos() {
         setLoadingAlunos(true);
         try {
             const token = localStorage.getItem("token");
@@ -52,9 +67,9 @@ function DiretFrequencia() {
             alert("Erro ao buscar alunos");
         }
         setLoadingAlunos(false);
-    };
+    }
 
-    const carregarPresencas = async () => {
+    async function carregarPresencas() {
         try {
             const token = localStorage.getItem("token");
             const dataISO = selectedData.toISOString().slice(0, 10);
@@ -69,15 +84,16 @@ function DiretFrequencia() {
         } catch {
             setPresencas({});
         }
-    };
+    }
 
-    const handlePresenca = (id, presente) => {
+    function handlePresenca(id, presente) {
         setPresencas((prev) => ({ ...prev, [id]: presente }));
-    };
+    }
 
-    const salvarChamada = async () => {
+    async function salvarChamada() {
         if (!titulo.trim()) return alert("Informe um título para a chamada");
         if (!userIdInput || Number(userIdInput) <= 0) return alert("ID de usuário inválido");
+
         setSalvando(true);
         try {
             const token = localStorage.getItem("token");
@@ -101,28 +117,30 @@ function DiretFrequencia() {
             alert("Erro ao salvar chamada.");
         }
         setSalvando(false);
-    };
+    }
 
     return (
         <div className="centro">
-
+            {/* Sidebar */}
             <div className="sidebar">
-                <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
-                <a href="/diret/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/diret/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/diret/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
                 <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-                <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-                <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+                <a href="/diret/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/diret/notas"><i className="fa-solid fa-note-sticky"></i> NOTAS</a>
                 <a href="#" className="active"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-                <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
+                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i> PROFESSOR</a>
+                <a href="/diret/aluno"><i className="fa-circle-user"></i> ALUNOS</a>
                 <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
+
+            {/* Conteúdo principal */}
             <div className="content">
                 <div className="header">
                     <div className="welcome">
-                        Olá, Bem-vindo <strong>Carlos Pereira</strong>
+                        Olá, Bem-vindo <strong>{nomeUsuario}</strong>
                     </div>
                     <div className="icons">
                         <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>
@@ -134,15 +152,28 @@ function DiretFrequencia() {
 
                 <h1 className="frequencia-title">Registrar Chamada</h1>
 
+                {/* Calendário */}
                 <label className="frequencia-label">Escolha a data:</label>
                 <div className="frequencia-card">
-                    <Calendar onChange={setSelectedData} value={selectedData} />
+                    <Calendar
+                        onChange={setSelectedData}
+                        value={selectedData}
+                        formatShortWeekday={(locale, date) =>
+                            date.toLocaleDateString("pt-BR", { weekday: "long" }).replace("-feira", "")
+                        }
+                        formatDay={(locale, date) => date.getDate()}
+                    />
                 </div>
 
+                {/* Seleção da turma */}
                 {selectedData && (
                     <>
                         <label className="frequencia-label">Selecione a Turma:</label>
-                        <select value={selectedTurma} onChange={(e) => setSelectedTurma(e.target.value)} className="frequencia-input">
+                        <select
+                            value={selectedTurma}
+                            onChange={(e) => setSelectedTurma(e.target.value)}
+                            className="frequencia-input"
+                        >
                             <option value="">-- Selecione --</option>
                             {turmas.map((turma) => (
                                 <option key={turma.idt} value={turma.idt}>{turma.nome}</option>
@@ -151,16 +182,35 @@ function DiretFrequencia() {
                     </>
                 )}
 
+                {/* Formulário da chamada */}
                 {selectedTurma && (
                     <>
                         <label className="frequencia-label">Título da chamada:</label>
-                        <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="frequencia-input" placeholder="Ex: Chamada 1" />
+                        <input
+                            type="text"
+                            value={titulo}
+                            onChange={(e) => setTitulo(e.target.value)}
+                            className="frequencia-input"
+                            placeholder="Ex: Chamada 1"
+                        />
 
                         <label className="frequencia-label">Matéria (opcional):</label>
-                        <input type="text" value={materia} onChange={(e) => setMateria(e.target.value)} className="frequencia-input" placeholder="Ex: Matemática" />
+                        <input
+                            type="text"
+                            value={materia}
+                            onChange={(e) => setMateria(e.target.value)}
+                            className="frequencia-input"
+                            placeholder="Ex: Matemática"
+                        />
 
                         <label className="frequencia-label">Seu ID de usuário (professor):</label>
-                        <input type="number" value={userIdInput} onChange={(e) => setUserIdInput(e.target.value)} className="frequencia-input" placeholder="Digite seu ID" />
+                        <input
+                            type="number"
+                            value={userIdInput}
+                            onChange={(e) => setUserIdInput(e.target.value)}
+                            className="frequencia-input"
+                            placeholder="Digite seu ID"
+                        />
 
                         <h3 className="frequencia-subtitle">Marcar Presença</h3>
 
@@ -203,6 +253,3 @@ function DiretFrequencia() {
         </div>
     );
 }
-
-export default DiretFrequencia;
-

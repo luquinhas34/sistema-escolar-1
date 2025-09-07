@@ -63,16 +63,12 @@ export default function FrequenciaTurma() {
             />
             {/* SIDEBAR */}
             <div className="sidebar">
-                <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
-                <a href="/diret/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/diret/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-                <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-                <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/aluno/dash" ><i className="fas fa-home"></i> INICIO</a>
+                <a href="/aluno/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/aluno/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/aluno/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+                <a href="/aluno/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
                 <a href="#" className="active"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
-                <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-                <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
-                <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
 
@@ -83,7 +79,7 @@ export default function FrequenciaTurma() {
                         Olá, Bem-vindo <strong>{nomeUsuario}</strong>
                     </div>
                     <div className="icons">
-                        <a href="/diret/chat"><i className="fas fa-envelope"></i></a>
+                        <a href="/aluno/chat"><i className="fas fa-envelope"></i></a>
                         <div className="user">
                             <i className="fas fa-user-circle"></i>
                         </div>

@@ -72,12 +72,191 @@
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
-
 .frequencia-card {
+  width: 100%;
+  max-width: 1532px; /* largura máxima igual à da imagem */
+  margin: 0 auto; /* centraliza horizontalmente */
+  padding: 20px;
   background-color: #fff;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal */
+.frequencia-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3a3a3a;
   margin-bottom: 20px;
-  width: fit-content;
+  letter-spacing: 1px;
+}
+
+/* Labels dos campos */
+.frequencia-label {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  display: block;
+  color: #555;
+}
+
+/* Inputs e select */
+.frequencia-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 16px;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.frequencia-input:focus {
+  border-color: #6a5acd;
+  box-shadow: 0 0 8px rgba(106, 90, 205, 0.2);
+}
+
+/* Subtítulo */
+.frequencia-subtitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 4px;
+}
+
+/* Caixa do aluno */
+.frequencia-aluno-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f8f8;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.frequencia-aluno-box:hover {
+  background-color: #f0f0f0;
+}
+
+/* Botões de presença/falta */
+.frequencia-btn {
+  padding: 6px 12px;
+  margin-left: 4px;
+  margin-right: 4px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-presente {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-presente:hover {
+  background-color: #45a045;
+}
+
+.btn-falta {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-falta:hover {
+  background-color: #e53935;
+}
+
+/* Botão salvar chamada */
+.frequencia-btn-salvar {
+  display: inline-block;
+  background-color: #6a5acd;
+  color: white;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.frequencia-btn-salvar:hover {
+  background-color: #5848b0;
+  transform: translateY(-2px);
+}
+
+.frequencia-btn-salvar:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mensagens de loading ou vazio */
+.frequencia-card p,
+.frequencia-aluno-box p {
+  font-size: 1rem;
+  color: #777;
+}
+.calendario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendario-select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.calendario-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.calendario-semana-dia {
+  padding: 10px 0;
+}
+
+.calendario-grid {
+  display: grid;
+
+  width: 1000px;
+
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.calendario-dia {
+  padding: 15px 0;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #f3f3f3;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.calendario-dia:hover {
+  background-color: #e0d7ff;
+}
+
+.calendario-dia.ativo {
+  background-color: #a678ff;
+  color: white;
+  font-weight: bold;
 }

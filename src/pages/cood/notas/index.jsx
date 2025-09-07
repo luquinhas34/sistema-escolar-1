@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import "../notas/style.css";
 
 export default function FrequenciaTurma() {
     const [turmas, setTurmas] = useState([]);
@@ -42,10 +41,91 @@ export default function FrequenciaTurma() {
 
     return (
         <div className="centro">
+            {/* CSS embutido */}
+            <style>{`
+                .centro {
+                    display: flex;
+                    min-height: 100vh;
+                }
+                    .content{
+                   background-color: #fff;
+
+                    }
+               
+                .content { flex: 1; padding: 20px 30px; background-color: #f5f6fa; }
+                .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+                .welcome { font-size: 1.2rem; }
+                .icons { display: flex; align-items: center; gap: 15px; }
+                .icons a { color: #333; font-size: 1.2rem; }
+                .icons a.active { color: #6a0dad; }
+                .user i { font-size: 1.8rem; color: #6a0dad; }
+                .coodnotas-info-cards { display: flex; flex-direction: column; gap: 30px; }
+                .coodnotas-section h2 { margin-bottom: 20px; color: #6a0dad; }
+                .coodnotas-select {
+                    padding: 10px 12px;
+                    border: 1px solid #ccc;
+                    border-radius: 8px;
+                    background-color: #fff;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+                .coodnotas-select:hover { border-color: #6a0dad; }
+                .coodnotas-card {
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                }
+                .recharts-wrapper { margin-top: 15px; }
+                .coodnotas-button-active {
+                    padding: 10px 20px;
+                    background-color: #6a0dad;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: all 0.2s ease;
+                }
+                .coodnotas-button-active:hover { background-color: #7e1bdc; }
+                .coodnotas-button-disabled {
+                    padding: 10px 20px;
+                    background-color: #ccc;
+                    color: #666;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: not-allowed;
+                    font-weight: 600;
+                }
+                .coodnotas-table-header, .coodnotas-table-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #eee;
+                }
+                .coodnotas-table-header span { font-weight: 700; color: #555; }
+                .coodnotas-table-row span { color: #333; }
+                @media (max-width: 1024px) {
+                    .centro { flex-direction: column; }
+                    .sidebar {
+                        width: 100%;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        justify-content: space-around;
+                        padding: 10px;
+                        box-shadow: none;
+                    }
+                    .content { padding: 15px; }
+                }
+            `}</style>
+
+            {/* Font Awesome */}
             <link
                 rel="stylesheet"
                 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
             />
+
             {/* SIDEBAR */}
             <div className="sidebar">
                 <a href="/cood/dash" ><i className="fas fa-home"></i> INICIO</a>
@@ -60,6 +140,8 @@ export default function FrequenciaTurma() {
                 <a href="/cood/turmas"><i className="fa-circle-user"></i> TURMAS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
+
+            {/* Conteúdo */}
             <div className="content">
                 <div className="header">
                     <div className="welcome">
@@ -67,13 +149,11 @@ export default function FrequenciaTurma() {
                     </div>
                     <div className="icons">
                         <a href="/cood/chat" className="active"><i className="fas fa-envelope"></i></a>
-                        <div className="user">
-                            <i className="fas fa-user-circle"></i>
-                        </div>
+                        <div className="user"><i className="fas fa-user-circle"></i></div>
                     </div>
                 </div>
 
-                {/* CONTEÚDO */}
+                {/* Conteúdo principal */}
                 <div className="coodnotas-info-cards">
                     <div className="coodnotas-section">
                         <h2>Frequência por Turma</h2>
@@ -87,9 +167,7 @@ export default function FrequenciaTurma() {
                             >
                                 <option value="">Selecione uma turma</option>
                                 {turmas.map((turma) => (
-                                    <option key={turma.idt} value={turma.idt}>
-                                        {turma.nome}
-                                    </option>
+                                    <option key={turma.idt} value={turma.idt}>{turma.nome}</option>
                                 ))}
                             </select>
 

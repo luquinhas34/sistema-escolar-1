@@ -30,9 +30,11 @@ export default function Horario() {
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFim, setHoraFim] = useState("");
   const [diaModal, setDiaModal] = useState("Segunda");
-  const [turnoModal, setTurnoModal] = useState("manhã");
+  const [turnoModal, setTurnoModal] = useState("manha");
   const [horarios, setHorarios] = useState([]);
   const [horarioSelecionado, setHorarioSelecionado] = useState(null);
+  const [mensagem, setMensagem] = useState("");
+  const [erro, setErro] = useState("");
 
   // 🔹 Pega usuário logado
   const user = getStoredUser();
@@ -45,6 +47,7 @@ export default function Horario() {
         setHorarios(res.data);
       } catch (err) {
         console.error("Erro ao carregar horários:", err);
+        setErro("Erro ao carregar horários.");
       }
     }
     carregarHorarios();
@@ -55,13 +58,13 @@ export default function Horario() {
     setHoraInicio("");
     setHoraFim("");
     setDiaModal(diaSelecionado);
-    setTurnoModal(turnoSelecionado || "manhã");
+    setTurnoModal(turnoSelecionado || "manha");
     setHorarioSelecionado(null);
   }
 
   async function handleSalvarHorario() {
     if (!diaModal || !turnoModal || !tituloHorario || !horaInicio || !horaFim) {
-      alert("Por favor, preencha todos os campos.");
+      setErro("Preencha todos os campos.");
       return;
     }
 
@@ -80,8 +83,10 @@ export default function Horario() {
           `http://localhost:3000/api/horarios/${horarioSelecionado.id}`,
           novoHorario
         );
+        setMensagem("Horário editado com sucesso!");
       } else {
         await axios.post("http://localhost:3000/api/horarios", novoHorario);
+        setMensagem("Horário adicionado com sucesso!");
       }
       const res = await axios.get(`http://localhost:3000/api/horarios/${turmaId}`);
       setHorarios(res.data);
@@ -90,13 +95,13 @@ export default function Horario() {
       setModoEdicao(false);
     } catch (err) {
       console.error("Erro ao salvar horário:", err);
-      alert("Erro ao salvar horário. Veja o console.");
+      setErro("Erro ao salvar horário.");
     }
   }
 
   async function handleAdicionarOutro() {
     if (!diaModal || !turnoModal || !tituloHorario || !horaInicio || !horaFim) {
-      alert("Por favor, preencha todos os campos.");
+      setErro("Preencha todos os campos.");
       return;
     }
 
@@ -114,9 +119,10 @@ export default function Horario() {
       const res = await axios.get(`http://localhost:3000/api/horarios/${turmaId}`);
       setHorarios(res.data);
       limparFormulario();
+      setMensagem("Horário adicionado com sucesso!");
     } catch (err) {
       console.error("Erro ao adicionar horário:", err);
-      alert("Erro ao adicionar horário. Veja o console.");
+      setErro("Erro ao adicionar horário.");
     }
   }
 
@@ -126,9 +132,10 @@ export default function Horario() {
     try {
       await axios.delete(`http://localhost:3000/api/horarios/${id}`);
       setHorarios((prev) => prev.filter((h) => h.id !== id));
+      setMensagem("Horário excluído com sucesso!");
     } catch (err) {
       console.error("Erro ao excluir horário:", err);
-      alert("Erro ao excluir horário. Veja o console.");
+      setErro("Erro ao excluir horário.");
     }
   }
 
@@ -136,27 +143,23 @@ export default function Horario() {
     ? horarios.filter((h) => h.dia === diaSelecionado && h.turno === turnoSelecionado)
     : [];
 
+  const diaAtual = new Date().getDay(); // Domingo=0, Segunda=1, etc.
+  const diaAtualNome = dias[diaAtual - 1] || "";
+
   return (
     <div className="centro">
-      {/* --- Sidebar --- */}
       <div className="sidebar">
-        <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
-        <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/diret/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/aluno/dash"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/aluno/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/aluno/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/aluno/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="#" className="active"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-        <a href="/diret/notas"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
-        <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i>PROFESSOR</a>
-        <a href="/diret/aluno"><i className="fa-circle-user"></i> ALUNOS</a>
-        <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
+        <a href="/aluno/notas"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
-      {/* --- Conteúdo --- */}
       <div className="content">
         <div className="header">
-          {/* 🔹 Igual ao CadastroAluno */}
           <div className="welcome">
             Olá, Bem-vindo <strong>{nomeUsuario}</strong>
           </div>
@@ -165,6 +168,10 @@ export default function Horario() {
             <div className="user"><i className="fas fa-user-circle"></i></div>
           </div>
         </div>
+
+        {/* --- Mensagens --- */}
+        {mensagem && <div className="success-msg">{mensagem}</div>}
+        {erro && <div className="error-msg">{erro}</div>}
 
         <div className="horario-section">
           <h2>Horários</h2>
@@ -200,7 +207,7 @@ export default function Horario() {
                   setHorarioSelecionado(primeiro);
                   setShowModal(true);
                 } else {
-                  alert("Nenhum horário encontrado para editar neste dia e turno.");
+                  setErro("Nenhum horário encontrado para editar neste dia e turno.");
                 }
               }}
             >
@@ -224,7 +231,7 @@ export default function Horario() {
             {dias.map((dia) => (
               <button
                 key={dia}
-                className={`dia-btn ${diaSelecionado === dia ? "ativo" : ""}`}
+                className={`dia-btn ${diaSelecionado === dia ? "ativo" : ""} ${dia === diaAtualNome ? "hoje" : ""}`}
                 onClick={() => setDiaSelecionado(dia)}
               >
                 {dia}

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import Calendar from "react-calendar";
 import api from "../../../services/api";
 import "../frequencia/style.css";
 
-function FrequenciaCood() {
+function DiretFrequencia() {
     const [turmas, setTurmas] = useState([]);
     const [alunos, setAlunos] = useState([]);
     const [selectedData, setSelectedData] = useState(null);
@@ -14,6 +13,12 @@ function FrequenciaCood() {
     const [loadingAlunos, setLoadingAlunos] = useState(false);
     const [salvando, setSalvando] = useState(false);
     const [userIdInput, setUserIdInput] = useState("");
+    const [mesAtual, setMesAtual] = useState(new Date().getMonth());
+
+    const meses = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
 
     useEffect(() => {
         const carregarTurmas = async () => {
@@ -103,9 +108,27 @@ function FrequenciaCood() {
         setSalvando(false);
     };
 
+    const diasNoMes = (mes) => new Date(2025, mes + 1, 0).getDate();
+
+    const renderDias = () => {
+        const dias = diasNoMes(mesAtual);
+        const elementos = [];
+        for (let i = 1; i <= dias; i++) {
+            elementos.push(
+                <div
+                    key={i}
+                    className={`calendario-dia ${selectedData && selectedData.getDate() === i && selectedData.getMonth() === mesAtual ? 'ativo' : ''}`}
+                    onClick={() => setSelectedData(new Date(2025, mesAtual, i))}
+                >
+                    {i}
+                </div>
+            );
+        }
+        return elementos;
+    };
+
     return (
         <div className="centro">
-
             <div className="sidebar">
                 <a href="/cood/dash" ><i className="fas fa-home"></i> INICIO</a>
                 <a href="/cood/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
@@ -136,7 +159,29 @@ function FrequenciaCood() {
 
                 <label className="frequencia-label">Escolha a data:</label>
                 <div className="frequencia-card">
-                    <Calendar onChange={setSelectedData} value={selectedData} />
+                    {/* Cabeçalho do calendário */}
+                    <div className="calendario-header">
+                        <h3>2025</h3>
+                        <select
+                            className="calendario-select"
+                            value={mesAtual}
+                            onChange={(e) => setMesAtual(parseInt(e.target.value))}
+                        >
+                            {meses.map((mes, index) => (
+                                <option key={index} value={index}>{mes}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Dias da semana */}
+                    <div className="calendario-semana">
+                        {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map((dia) => (
+                            <div key={dia} className="calendario-semana-dia">{dia}</div>
+                        ))}
+                    </div>
+
+                    {/* Grid de dias */}
+                    <div className="calendario-grid">{renderDias()}</div>
                 </div>
 
                 {selectedData && (
@@ -204,5 +249,4 @@ function FrequenciaCood() {
     );
 }
 
-export default FrequenciaCood;
-
+export default DiretFrequencia;

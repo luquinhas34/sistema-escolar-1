@@ -1,6 +1,6 @@
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
-import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "../login/login.css";
 
@@ -23,11 +23,13 @@ function Login() {
 
     try {
       const res = await api.post("/api/login", { email, password });
-      console.log(res.data); // Verifique o que está sendo retornado do backend
 
-      if (res.data && res.data.token && res.data.role) { // Verifique o campo `role` corretamente
+      if (res.data && res.data.token && res.data.user) {
+        // Salva token e usuário no localStorage
         localStorage.setItem("token", res.data.token);
-        const userRole = res.data.role.trim().toLowerCase(); // Acesse `role` diretamente
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+
+        const userRole = res.data.user.role.trim().toLowerCase();
 
         const roleRoutes = {
           aluno_vall: "/aluno/dash",
@@ -38,29 +40,22 @@ function Login() {
           cood_vall: "/cood/dash",
         };
 
-
-
         const route = roleRoutes[userRole];
-
         if (route) {
           navigate(route);
         } else {
           setError(`Função ${userRole} não reconhecida.`);
         }
       } else {
-        setError("Erro ao autenticar: Token ou role inválidos.");
+        setError("Erro ao autenticar: Token ou usuário inválido.");
       }
-
-    } catch (error) {
-      const errorMessage = error.response
-        ? error.response.data.message || error.message
+    } catch (err) {
+      const errorMessage = err.response
+        ? err.response.data.message || err.message
         : "Erro ao fazer login. Tente novamente.";
       setError(errorMessage);
     }
   }
-
-
-
 
   return (
     <div className="login-container">
@@ -69,9 +64,7 @@ function Login() {
         <form className="login-form" onSubmit={handleLogin}>
           <h2>Acessar</h2>
 
-          {error && (
-            <div className="bg-red-200 text-red-800 p-2 rounded mb-4">{error}</div>
-          )}
+          {error && <div className="bg-red-200 text-red-800 p-2 rounded mb-4">{error}</div>}
 
           <div className="form-group">
             <label htmlFor="email">E-mail ou Telefone</label>

@@ -2,18 +2,16 @@ import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "../avaliacoes/style.css";
 
-
 function ProfAvaliacoes() {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
     dataInicio: "",
     dataFim: "",
-    turmaIdt: 0,   // ou null, mas zero para indicar "não selecionado"
-    userId: 0,     // preenchido depois do useEffect
+    turmaIdt: 0,
+    userId: 0,
     documento: null,
   });
-
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [avaliacoes, setAvaliacoes] = useState([]);
@@ -40,10 +38,6 @@ function ProfAvaliacoes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Dados a serem enviados:", formData);
-
-
-    // Verificações adicionais
     const turmaIdtNum = Number(formData.turmaIdt);
     const userIdNum = Number(formData.userId);
 
@@ -60,7 +54,6 @@ function ProfAvaliacoes() {
     }
 
     const data = new FormData();
-
     data.append("titulo", formData.titulo);
     data.append("descricao", formData.descricao);
     data.append("dataInicio", formData.dataInicio);
@@ -74,7 +67,6 @@ function ProfAvaliacoes() {
 
     try {
       const token = localStorage.getItem("token");
-
       const response = await api.post("/api/avaliacoes", data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -98,34 +90,29 @@ function ProfAvaliacoes() {
       buscarAvaliacoes();
     } catch (error) {
       console.error("Erro ao criar avaliação:", error);
-      if (error.response?.data?.message) {
-        setErro(`Erro: ${error.response.data.message}`);
-      } else {
-        setErro("Erro ao criar avaliação. Verifique os campos.");
-      }
+      setErro(error.response?.data?.message || "Erro ao criar avaliação.");
     }
   };
 
-
-  // Renomeada para manter consistência
   const buscarAvaliacoes = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await api.get("/api/avaliacoes", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setAvaliacoes(response.data);
     } catch (error) {
-      console.error('Erro ao criar avaliação:', error);
-      console.log('Resposta do servidor:', error.response?.data);
+      console.error("Erro ao buscar avaliações:", error);
     }
   };
 
   const handleEditaravaliacoes = (avaliacao) => {
-    const dataInicio = avaliacao.dataInicio ? new Date(avaliacao.dataInicio).toISOString().slice(0, 16) : "";
-    const dataFim = avaliacao.dataFim ? new Date(avaliacao.dataFim).toISOString().slice(0, 16) : "";
+    const dataInicio = avaliacao.dataInicio
+      ? new Date(avaliacao.dataInicio).toISOString().slice(0, 16)
+      : "";
+    const dataFim = avaliacao.dataFim
+      ? new Date(avaliacao.dataFim).toISOString().slice(0, 16)
+      : "";
 
     setFormData({
       id: avaliacao.id,
@@ -142,8 +129,6 @@ function ProfAvaliacoes() {
     setMostrarFormulario(true);
   };
 
-
-
   const handleRemoveravaliacoes = (id) => {
     setIdParaExcluir(id);
     setMostrarModalExcluir(true);
@@ -153,9 +138,7 @@ function ProfAvaliacoes() {
     try {
       const token = localStorage.getItem("token");
       await api.delete(`/api/avaliacoes/${idParaExcluir}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setMensagem("Avaliação excluída com sucesso!");
       setErro("");
@@ -190,8 +173,7 @@ function ProfAvaliacoes() {
     const userFromStorage = JSON.parse(localStorage.getItem("user"));
     if (userFromStorage) {
       setUser(userFromStorage);
-      // Definir o ID do usuário no formulário automaticamente
-      setFormData(prev => ({ ...prev, userId: userFromStorage.id }));
+      setFormData((prev) => ({ ...prev, userId: userFromStorage.id }));
     }
 
     buscarTurmas();
@@ -204,54 +186,42 @@ function ProfAvaliacoes() {
         setMensagem("");
         setErro("");
       }, 10000);
-
       return () => clearTimeout(timer);
     }
   }, [mensagem, erro]);
 
   const handleTurmaChange = (e) => {
     const value = e.target.value;
-
     setSelectedTurma(value);
-
-    // Aqui garantimos que apenas valores numéricos válidos sejam aplicados
-    const turmaIdConvertido = value !== "" && !isNaN(Number(value)) ? Number(value) : "";
-
-    setFormData((prev) => ({
-      ...prev,
-      turmaIdt: turmaIdConvertido,
-    }));
+    const turmaIdConvertido =
+      value !== "" && !isNaN(Number(value)) ? Number(value) : "";
+    setFormData((prev) => ({ ...prev, turmaIdt: turmaIdConvertido }));
   };
-
-
-
-
 
   return (
     <div className="centro">
       <div className="sidebar">
-        <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
-        <a href="/diret/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
+        <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
         <a href="#" className="active"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
         <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-        <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-        <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/diret/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/diret/notas"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
         <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-        <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
+        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i>PROFESSOR</a>
+        <a href="/diret/aluno"><i className="fa-circle-user"></i>ALUNOS</a>
         <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
+
       <div className="content">
         <div className="header">
           <div className="welcome">
-            Olá, Bem-vindo <strong>Carlos Pereira</strong>
+            Olá, Bem-vindo <strong>{user?.name || user?.nome || "Usuário"}</strong>
           </div>
           <div className="icons">
             <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>
-            <div className="user">
-              <i className="fas fa-user-circle"></i>
-            </div>
+            <div className="user"><i className="fas fa-user-circle"></i></div>
           </div>
         </div>
 
@@ -260,12 +230,9 @@ function ProfAvaliacoes() {
             type="button"
             className="add-button"
             onClick={() => {
-              if (mostrarFormulario && avaliacoesParaEditar) {
-                setAvaliacoesParaEditar(null);
-              }
+              if (mostrarFormulario && avaliacoesParaEditar) setAvaliacoesParaEditar(null);
               setMostrarFormulario(!mostrarFormulario);
               if (mostrarFormulario) {
-                // Resetar o formulário quando fechar
                 setFormData({
                   titulo: "",
                   descricao: "",
@@ -286,76 +253,34 @@ function ProfAvaliacoes() {
         {mostrarFormulario && (
           <form onSubmit={handleSubmit}>
             <label>Título <span style={{ color: "red" }}>*</span></label>
-            <input
-              type="text"
-              name="titulo"
-              value={formData.titulo}
-              onChange={handleInputChange}
-              required
-            />
+            <input type="text" name="titulo" value={formData.titulo} onChange={handleInputChange} required />
 
             <label>Descrição <span style={{ color: "red" }}>*</span></label>
-            <textarea
-              name="descricao"
-              value={formData.descricao}
-              onChange={handleInputChange}
-              required
-            />
+            <textarea name="descricao" value={formData.descricao} onChange={handleInputChange} required />
+
             <label>
               Selecionar Turma: <span style={{ color: "red" }}>*</span>
-              <select
-                value={selectedTurma}
-                onChange={handleTurmaChange}
-                required
-              >
+              <select value={selectedTurma} onChange={handleTurmaChange} required>
                 <option value="">Selecione uma turma</option>
                 {turmas.map((turma) => (
-                  <option key={turma.idt} value={turma.idt}>
-                    {turma.nome} (ID {turma.idt})
-                  </option>
-
-
-
+                  <option key={turma.idt} value={turma.idt}>{turma.nome} (ID {turma.idt})</option>
                 ))}
               </select>
             </label>
 
             <label>Data Início <span style={{ color: "red" }}>*</span></label>
-            <input
-              type="datetime-local"
-              name="dataInicio"
-              value={formData.dataInicio}
-              onChange={handleInputChange}
-              required
-            />
+            <input type="datetime-local" name="dataInicio" value={formData.dataInicio} onChange={handleInputChange} required />
+
             <label>Data Fim <span style={{ color: "red" }}>*</span></label>
-            <input
-              type="datetime-local"
-              name="dataFim"
-              value={formData.dataFim}
-              onChange={handleInputChange}
-              required
-            />
+            <input type="datetime-local" name="dataFim" value={formData.dataFim} onChange={handleInputChange} required />
+
             <label>Documento</label>
-            <input
-              type="file"
-              name="documento"
-              onChange={handleFileChange}
-            />
+            <input type="file" name="documento" onChange={handleFileChange} />
+
             <label>Seu ID <span style={{ color: "red" }}>*</span></label>
-            <input
-              type="text"
-              name="userId"
-              value={formData.userId}
-              onChange={handleInputChange}
-              required
-              readOnly={user?.id ? true : false}
-            />
+            <input type="text" name="userId" value={formData.userId} onChange={handleInputChange} readOnly={!!user?.id} />
 
-            <button type="submit">
-              {avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}
-            </button>
-
+            <button type="submit">{avaliacoesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
           </form>
         )}
 

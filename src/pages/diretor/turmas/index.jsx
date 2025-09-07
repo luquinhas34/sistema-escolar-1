@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "../turmas/style.css";
 
+// 🔹 Helper para pegar usuário logado do localStorage
+function getStoredUser() {
+    try {
+        const raw = localStorage.getItem("user");
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+
 export default function GerenciarTurmas() {
     const [turmas, setTurmas] = useState([]);
     const [alunos, setAlunos] = useState([]);
@@ -10,6 +20,10 @@ export default function GerenciarTurmas() {
     const [filtroNome, setFiltroNome] = useState("");
     const [mensagem, setMensagem] = useState("");
     const [novaTurmaNome, setNovaTurmaNome] = useState("");
+
+    // 🔹 Recupera nome do usuário logado
+    const user = getStoredUser();
+    const nomeUsuario = user?.nome || user?.name || "Usuário";
 
     useEffect(() => {
         buscarTurmas();
@@ -97,23 +111,26 @@ export default function GerenciarTurmas() {
 
     return (
         <div className="centro">
+            {/* SIDEBAR */}
             <div className="sidebar">
-                <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
-                <a href="/diret/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/diret/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/diret/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
                 <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-                <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-                <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+                <a href="/diret/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/diret/notas"><i className="fa-solid fa-note-sticky"></i> NOTAS</a>
                 <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-                <a href="/diret/aluno"><i className="fa-circle-user" ></i>ALUNOS</a>
+                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i> PROFESSOR</a>
+                <a href="/diret/aluno"><i className="fa-circle-user"></i> ALUNOS</a>
                 <a href="#" className="active"><i className="fa-circle-user"></i> TURMAS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
+
+            {/* CONTENT */}
             <div className="content">
                 <div className="header">
                     <div className="welcome">
-                        Olá, Bem-vindo <strong>Carlos Pereira</strong>
+                        Olá, Bem-vindo <strong>{nomeUsuario}</strong>
                     </div>
                     <div className="icons">
                         <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>

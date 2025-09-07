@@ -1,19 +1,19 @@
-import { } from "react-router-dom";
-import axios from "axios";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "../avisos/style.css";
 
 function Profaviso() {
-    const [avisos, setAvisos] = useState([]);  // Estado de avisos como array
+    const [avisos, setAvisos] = useState([]);
     const [titulo, setTitulo] = useState("");
     const [descricao, setDescricao] = useState("");
-    const [loading, setLoading] = useState(true);  // Estado de carregamento
-    const [erro, setErro] = useState("");  // Estado de erro
-    const [loadingAdd, setLoadingAdd] = useState(false);  // Carregamento para adicionar aviso
-    const [loadingDelete, setLoadingDelete] = useState(false);  // Carregamento para excluir aviso
+    const [loading, setLoading] = useState(true);
+    const [erro, setErro] = useState("");
+    const [loadingAdd, setLoadingAdd] = useState(false);
+    const [loadingDelete, setLoadingDelete] = useState(false);
+    const [user, setUser] = useState({ name: "Usuário" });
 
     const api = axios.create({
-        baseURL: 'http://localhost:3000',  // Base URL do backend
+        baseURL: 'http://localhost:3000',
     });
 
     api.interceptors.request.use((config) => {
@@ -22,29 +22,30 @@ function Profaviso() {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
-
     });
 
-    // Carregar os avisos da API ao carregar o componente
     useEffect(() => {
         const fetchAvisos = async () => {
             try {
                 const response = await api.get("/api/avisos");
-                setAvisos(response.data);  // Atualiza o estado com os avisos recebidos
-                setLoading(false); // Indica que o carregamento foi concluído
-            } catch (eror) {
+                setAvisos(response.data);
+                setLoading(false);
+            } catch (error) {
                 setErro("Erro ao buscar avisos.");
-                setLoading(false); // Também deve finalizar o carregamento em caso de erro
+                setLoading(false);
             }
         };
-        fetchAvisos();
-    }, []);  // O array vazio garante que a requisição ocorra apenas uma vez, no carregamento inicial
 
-    // Adicionar novo aviso
+        const userFromStorage = JSON.parse(localStorage.getItem("user"));
+        if (userFromStorage) {
+            setUser(userFromStorage);
+        }
+
+        fetchAvisos();
+    }, []);
+
     const handleAddAviso = async () => {
         const token = localStorage.getItem("token");
-
-        // Verificar se o token existe antes de realizar a requisição
         if (!token) {
             alert("Você precisa estar logado para criar um aviso.");
             return;
@@ -55,53 +56,44 @@ function Profaviso() {
             return;
         }
 
-        setErro("");  // Limpa o erro anterior
-        setLoadingAdd(true);  // Indica que está carregando enquanto adiciona
+        setErro("");
+        setLoadingAdd(true);
 
         try {
             const response = await api.post("/api/avisos", { titulo, descricao }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
-            setAvisos((prevAvisos) => [...prevAvisos, response.data]); // Atualiza a lista de avisos
-            setTitulo("");  // Limpa os campos
+            setAvisos((prev) => [...prev, response.data]);
+            setTitulo("");
             setDescricao("");
         } catch (error) {
             setErro("Erro ao criar o aviso.");
         } finally {
-            setLoadingAdd(false);  // Finaliza o carregamento após a operação
+            setLoadingAdd(false);
         }
     };
 
-    // Excluir um aviso
     const handleDeleteAviso = async (id) => {
         const token = localStorage.getItem("token");
-
         if (!token) {
             alert("Você precisa estar logado para excluir um aviso.");
             return;
         }
 
-        setLoadingDelete(true);  // Indica que está carregando enquanto exclui
-
+        setLoadingDelete(true);
         try {
             await api.delete(`/api/avisos/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
-            setAvisos((prevAvisos) => prevAvisos.filter((aviso) => aviso.id !== id));
+            setAvisos((prev) => prev.filter((aviso) => aviso.id !== id));
         } catch (error) {
             setErro("Erro ao excluir o aviso.");
         } finally {
-            setLoadingDelete(false);  // Finaliza o carregamento após a operação
+            setLoadingDelete(false);
         }
     };
 
-    if (loading) {
-        return <div>Carregando avisos...</div>; // Exibe um carregando enquanto espera pela resposta
-    }
+    if (loading) return <div>Carregando avisos...</div>;
 
     return (
         <div className="centro">
@@ -111,33 +103,33 @@ function Profaviso() {
             />
 
             <div className="sidebar">
-                <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
-                <a href="/diret/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/diret/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/diret/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
                 <a href="#" className="active"><i className="fas fa-bell"></i> AVISOS</a>
-                <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-                <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+                <a href="/diret/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/diret/notas"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
                 <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-                <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
+                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i>PROFESSOR</a>
+                <a href="/diret/aluno"><i className="fa-circle-user"></i>ALUNOS</a>
                 <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
+
             <div className="content">
                 <div className="header">
                     <div className="welcome">
-                        Olá, Bem-vindo <strong>Carlos Pereira</strong>
+                        Olá, Bem-vindo <strong>{user?.name || user?.nome || "Usuário"}</strong>
                     </div>
                     <div className="icons">
                         <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>
-                        <div className="user">
-                            <i className="fas fa-user-circle"></i>
-                        </div>
+                        <div className="user"><i className="fas fa-user-circle"></i></div>
                     </div>
                 </div>
+
                 <div className="content-diretaviso">
                     <h2>Avisos</h2>
-                    {erro && <div className="alert alert-danger">{erro}</div>} {/* Exibe mensagem de erro */}
+                    {erro && <div className="alert alert-danger">{erro}</div>}
                     <div className="add-aviso">
                         <input
                             type="text"

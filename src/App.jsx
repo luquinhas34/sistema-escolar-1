@@ -34,6 +34,15 @@ import DiretorNotas from "./pages/diretor/notas"
 import Diretorhorario from "./pages/diretor/horario"
 // Diretor
 
+// Aluno
+import Aluno from "./pages/aluno/aluno.jsx";
+import AlunoDash from "./pages/aluno/dash";
+import AlunoActive from "./pages/aluno/atividades"
+import AlunoAvali from "./pages/aluno/avaliacoes"
+import AlunoAviso from "./pages/aluno/avisos"
+import AlunoNotas from "./pages/aluno/notas"
+import Alunohorario from "./pages/aluno/horario"
+// Aluno
 function App() {
   return (
     <BrowserRouter>
@@ -68,6 +77,15 @@ function App() {
           <Route path="/cood/Notas" element={<NotasCodd />} />
         </Route>
 
+
+        <Route path="/aluno" element={<Aluno />}>
+          <Route path="dash" element={<AlunoDash />} />
+          <Route path="atividades" element={<AlunoActive />} />
+          <Route path="avaliacoes" element={<AlunoAvali />} />
+          <Route path="avisos" element={<AlunoAviso />} />
+          <Route path="horario" element={<Alunohorario />} />
+          <Route path="/aluno/Notas" element={<AlunoNotas />} />
+        </Route>
 
         <Route path="/Admin" element={<Admin />} />
 
