@@ -1,172 +1,112 @@
-
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import "../notas/style.css";
+import api from "../../../services/api"; // Usando o 'api'
+import "./style.css"; // Reutilizando o mesmo CSS
 
-// 🔹 Helper para pegar usuário logado do localStorage
-function getStoredUser() {
-    try {
-        const raw = localStorage.getItem("user");
-        return raw ? JSON.parse(raw) : null;
-    } catch {
-        return null;
-    }
-}
-
-export default function FrequenciaTurma() {
-    const [turmas, setTurmas] = useState([]);
-    const [turmaSelecionada, setTurmaSelecionada] = useState("");
-    const [mesSelecionado, setMesSelecionado] = useState("");
-    const [alunos, setAlunos] = useState([]);
-
-    const COLORS = ["#a64efc", "#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#ffbb28"];
-
-    // 🔹 Recupera nome do usuário
-    const user = getStoredUser();
-    const nomeUsuario = user?.nome || user?.name || "Usuário";
+export default function AlunoNotas() {
+    const [notas, setNotas] = useState([]);
+    const [user, setUser] = useState({ name: "Aluno" });
+    const [loading, setLoading] = useState(true);
+    const [erro, setErro] = useState("");
 
     useEffect(() => {
-        async function buscarTurmas() {
-            try {
-                const res = await axios.get("http://localhost:3000/api/turmas");
-                setTurmas(res.data);
-            } catch (err) {
-                console.error("Erro ao carregar turmas", err);
-            }
+        let alunoId = null;
+
+        // 1. Pega o usuário do localStorage
+        const userFromStorage = JSON.parse(localStorage.getItem("user"));
+        if (userFromStorage) {
+            setUser(userFromStorage);
+            alunoId = userFromStorage.id; // 2. Pega o ID do aluno logado
         }
-        buscarTurmas();
-    }, []);
 
-    useEffect(() => {
-        async function buscarFrequencia() {
-            if (!turmaSelecionada || !mesSelecionado) return;
+        if (!alunoId) {
+            setErro("Não foi possível identificar o aluno. Faça login novamente.");
+            setLoading(false);
+            return;
+        }
 
+        // 3. Busca as notas específicas desse aluno
+        async function buscarMinhasNotas() {
+            setLoading(true);
+            setErro("");
             try {
-                const res = await axios.get(
-                    `http://localhost:3000/api/frequencia/turma/${turmaSelecionada}?mes=${mesSelecionado}`
-                );
-                setAlunos(res.data);
+                const token = localStorage.getItem("token");
+                // 4. Chama a API de aluno (que o back-end agora tem)
+                const res = await api.get(`/api/notas/aluno/${alunoId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setNotas(res.data);
             } catch (err) {
-                console.error("Erro ao buscar frequência", err);
+                setErro("Falha ao carregar suas notas.");
+            } finally {
+                setLoading(false);
             }
         }
 
-        buscarFrequencia();
-    }, [turmaSelecionada, mesSelecionado]);
+        buscarMinhasNotas();
+    }, []); // Executa apenas uma vez na montagem
 
     return (
         <div className="centro">
-            <link
-                rel="stylesheet"
-                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-            />
-            {/* SIDEBAR */}
+            {/* SIDEBAR DO ALUNO */}
             <div className="sidebar">
-                <a href="/aluno/dash" ><i className="fas fa-home"></i> INICIO</a>
-                <a href="/aluno/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/aluno/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/aluno/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/aluno/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/aluno/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
                 <a href="/aluno/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-                <a href="/aluno/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-                <a href="#" className="active"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+                <a href="/aluno/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="#" className="active"><i className="fa-solid fa-note-sticky"></i> NOTAS</a>
+                <a href="/aluno/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
 
-            {/* CONTENT */}
+            {/* Conteúdo */}
             <div className="content">
                 <div className="header">
                     <div className="welcome">
-                        Olá, Bem-vindo <strong>{nomeUsuario}</strong>
+                        {/* Nome dinâmico do aluno */}
+                        Olá, Bem-vindo <strong>{user.name}</strong>
                     </div>
                     <div className="icons">
                         <a href="/aluno/chat"><i className="fas fa-envelope"></i></a>
-                        <div className="user">
-                            <i className="fas fa-user-circle"></i>
-                        </div>
+                        <div className="user"><i className="fas fa-user-circle"></i></div>
                     </div>
                 </div>
 
-                {/* CONTEÚDO */}
-                <div className="diretnotas-info-cards">
-                    <div className="diretnotas-section">
-                        <h2>Frequência por Turma</h2>
+                {/* Corpo da Página */}
+                <div className="notas-page-container">
+                    <div className="notas-card">
+                        <h2>Minhas Notas</h2>
 
-                        {/* Filtros */}
-                        <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-                            <select
-                                className="diretnotas-select"
-                                value={turmaSelecionada}
-                                onChange={(e) => setTurmaSelecionada(e.target.value)}
-                            >
-                                <option value="">Selecione uma turma</option>
-                                {turmas.map((turma) => (
-                                    <option key={turma.idt} value={turma.idt}>
-                                        {turma.nome}
-                                    </option>
-                                ))}
-                            </select>
+                        {erro && <div className="error">{erro}</div>}
+                        {loading && <p>Carregando notas...</p>}
 
-                            <select
-                                className="diretnotas-select"
-                                value={mesSelecionado}
-                                onChange={(e) => setMesSelecionado(e.target.value)}
-                            >
-                                <option value="">Selecione um mês</option>
-                                {Array.from({ length: 12 }, (_, i) => (
-                                    <option key={i} value={String(i + 1).padStart(2, "0")}>
-                                        {new Date(2025, i).toLocaleString("pt-BR", { month: "long" })}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Gráfico */}
-                        {alunos.length > 0 && (
-                            <div className="diretnotas-card">
-                                <h3>Distribuição de Faltas</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <PieChart>
-                                        <Pie
-                                            data={alunos}
-                                            dataKey="faltas"
-                                            nameKey="nome"
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius={100}
-                                            label={({ name, percent }) =>
-                                                `${name} (${(percent * 100).toFixed(0)}%)`
-                                            }
-                                        >
-                                            {alunos.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
+                        {!loading && notas.length === 0 && (
+                            <p>Nenhuma nota lançada para você até o momento.</p>
                         )}
 
-                        {/* Abas */}
-                        <div style={{ display: "flex", gap: "10px", margin: "20px 0" }}>
-                            <button className="diretnotas-button-active">Frequência</button>
-                            <button className="diretnotas-button-disabled" disabled>Notas</button>
-                        </div>
-
-                        {/* Tabela */}
-                        <div className="diretnotas-card">
-                            <div className="diretnotas-table-header">
-                                <span><strong>Alunos</strong></span>
-                                <span><strong>Faltas</strong></span>
-                            </div>
-                            {alunos.map((aluno, index) => (
-                                <div key={index} className="diretnotas-table-row">
-                                    <span>{aluno.nome}</span>
-                                    <span>{aluno.faltas}</span>
-                                </div>
-                            ))}
-                        </div>
+                        {/* A tabela de notas do aluno */}
+                        {!loading && notas.length > 0 && (
+                            <table className="notas-tabela">
+                                <thead>
+                                    <tr>
+                                        <th>Matéria</th>
+                                        <th>Tipo da Nota</th>
+                                        <th>Nota</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {notas.map((nota) => (
+                                        <tr key={nota.id}>
+                                            {/* A API do aluno (GET /api/notas/aluno/:id)
+                          deve incluir o nome da matéria */}
+                                            <td>{nota.materia?.nome || "Matéria não informada"}</td>
+                                            <td>{nota.tipo}</td>
+                                            <td>{nota.valor.toFixed(1)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 </div>
             </div>

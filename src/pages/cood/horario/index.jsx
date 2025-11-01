@@ -36,6 +36,8 @@ export default function AdicionarHorarios() {
           "http://localhost:3000/api/materia/listar"
         );
         console.log("Resposta matérias:", resMaterias.data);
+
+        console.log("Resposta matérias:", resMaterias.data);
         setMaterias(resMaterias.data || []);
         setLoadingMaterias(false);
       } catch (err) {
@@ -269,3 +271,4 @@ export default function AdicionarHorarios() {
     </div>
   );
 }
+

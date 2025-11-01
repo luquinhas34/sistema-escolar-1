@@ -1,0 +1,133 @@
+/* Adicione isto ao seu arquivo frequencia/style.css */
+
+/* Faz o dia do calendário parecer clicável */
+.calendario-dia.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendario-dia.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+/* --- Estilos do Modal (Mini-Janela) --- */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  z-index: 1001;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #6a0dad;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.frequencia-lista-modal {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 25px;
+}
+
+.frequencia-item-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.frequencia-item-modal:last-child {
+  border-bottom: none;
+}
+
+.frequencia-item-modal span {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Estilos para o status (Presente/Falta) dentro do modal */
+.frequencia-item-modal .status-presente {
+  color: #28a745;
+  font-weight: 600;
+}
+.frequencia-item-modal .status-falta {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Botão de Fechar do Modal */
+.frequencia-btn-fechar {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #6a0dad;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.frequencia-btn-fechar:hover {
+  background-color: #7e1bdc;
+}
+/* Adicione isto ao seu arquivo frequencia/style.css */
+
+/* --- Estilos da Seção de Resumo --- */
+
+.frequencia-resumo {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.frequencia-resumo h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #6a0dad;
+  text-align: center;
+}
+
+.frequencia-resumo p {
+  font-size: 1rem;
+  color: #333;
+  margin: 8px 0;
+}
+
+.frequencia-resumo span {
+  font-weight: bold;
+}
+
+.frequencia-resumo .total-presente {
+  color: #28a745; /* Verde */
+}
+
+.frequencia-resumo .total-falta {
+  color: #dc3545; /* Vermelho */
+}

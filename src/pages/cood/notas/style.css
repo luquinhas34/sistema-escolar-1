@@ -3,3 +3,144 @@
   width: 98vw;
   height: 85vh;
 }
+/* Salve como notas.css (ou style.css) na pasta do componente */
+.notas-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.notas-filtros {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.notas-select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.notas-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.notas-card h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #6a0dad;
+}
+
+.notas-tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.notas-tabela th,
+.notas-tabela td {
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.notas-tabela th {
+  color: #555;
+  font-weight: 700;
+}
+
+.notas-tabela td {
+  color: #333;
+}
+
+.notas-tabela .acao-botoes {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-editar,
+.btn-excluir {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-editar {
+  background-color: #007bff;
+}
+.btn-excluir {
+  background-color: #dc3545;
+}
+
+.btn-adicionar {
+  padding: 10px 20px;
+  background-color: #6a0dad;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+}
+.btn-adicionar:hover {
+  background-color: #7e1bdc;
+}
+
+/* Formulário de Adicionar/Editar */
+.notas-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  margin-top: 10px;
+}
+
+.notas-form label {
+  font-weight: 600;
+  color: #333;
+}
+
+.notas-form input,
+.notas-form select {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.notas-form .form-botoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Mensagens */
+.error {
+  color: red;
+  background-color: #ffe0e0;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+.success {
+  color: green;
+  background-color: #e0ffe0;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}

@@ -1,132 +1,156 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-import { useNavigate } from "react-router-dom";
-import "../atividades/style.css";
+import "../atividades/style.css"; // Reutilizando o mesmo CSS
 
-function AlunoAtividades() {
+/**
+ * Componente para Alunos visualizarem suas atividades.
+ *
+ * CORRIGIDO: Agora busca 'user' no localStorage (com base na ÚLTIMA imagem).
+ *
+ * ATENÇÃO: Isto só funcionará se a sua API de LOGIN
+ * salvar o ID da turma do aluno (ex: "turmaIdt")
+ * dentro do objeto 'user' no localStorage.
+ */
+function AlunoActive() {
+  // States
   const [atividades, setAtividades] = useState([]);
-  const [user, setUser] = useState(null);
-  const [turma, setTurma] = useState(null);
-  const navigate = useNavigate();
+  const [mensagem, setMensagem] = useState("");
+  const [erro, setErro] = useState("");
+  const [user, setUser] = useState({ name: "Aluno" });
+  const [loading, setLoading] = useState(false);
 
-  const buscarAtividades = async () => {
+  const buscarAtividadesDaMinhaTurma = async (turmaId) => {
+    if (!turmaId) {
+      setErro("Não foi possível identificar sua turma. Faça login novamente.");
+      return;
+    }
+
+    setLoading(true);
+    setErro("");
     try {
       const token = localStorage.getItem("token");
-      const response = await api.get("/api/atividades", {
+      const response = await api.get(`/api/atividades?turmaId=${turmaId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      // Filtra só atividades da turma do aluno
-      const atividadesFiltradas = turma
-        ? response.data.filter((a) => a.turmaIdt === turma.idt)
-        : [];
-
-      setAtividades(atividadesFiltradas);
+      setAtividades(response.data);
     } catch (error) {
-      console.error("Erro ao buscar atividades:", error);
+      console.error('Erro ao buscar atividades:', error);
+      setErro("Falha ao carregar as atividades. Tente novamente mais tarde.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Efeito 1: Executa 1 vez na montagem
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-    if (!token || !storedUser) {
-      navigate("/");
-      return;
+    let minhaTurmaId = null;
+
+    // ===================================================================
+    // ▼▼▼ CORREÇÃO APLICADA AQUI (baseado na sua última foto) ▼▼▼
+    //
+    // Buscando 'user' ao invés de 'usuario'
+    const userFromStorage = JSON.parse(localStorage.getItem("user"));
+    // ===================================================================
+
+    if (userFromStorage) {
+      setUser(userFromStorage);
+
+      // ===================================================================
+      // ▼▼▼ O PROBLEMA ESTÁ AQUI ▼▼▼
+      //
+      // O seu objeto 'user' NÃO TEM o campo 'turmaIdt'.
+      // Você precisa corrigir sua API DE LOGIN para incluir esse campo
+      // quando o aluno fizer login.
+      //
+      // Se o nome do campo for outro (ex: 'turmaId'), ajuste aqui:
+      minhaTurmaId = userFromStorage.turmaIdt;
+      // ===================================================================
     }
 
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
+    if (minhaTurmaId) {
+      buscarAtividadesDaMinhaTurma(minhaTurmaId);
+    } else {
+      // Este erro continuará aparecendo até você corrigir sua API de LOGIN
+      setErro("Erro: ID da sua turma não foi encontrado no seu usuário. (Sua API de login precisa enviar o 'turmaIdt').");
+      setLoading(false);
+    }
 
-    // Buscar a turma do aluno
-    const buscarTurmaAluno = async () => {
-      try {
-        const response = await api.get(`/api/turmas/aluno/${parsedUser.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTurma(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar turma do aluno:", error);
-      }
-    };
+  }, []); // Array vazio = executa 1 vez na montagem
 
-    buscarTurmaAluno();
-    buscarAtividades();
-  }, [navigate]);
+  // Efeito para limpar mensagens
+  useEffect(() => {
+    if (mensagem || erro) {
+      const timer = setTimeout(() => {
+        setMensagem("");
+        setErro("");
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensagem, erro]);
 
   return (
     <div className="centro">
+      {/* Sidebar (Menu) do Aluno */}
       <div className="sidebar">
-        <a href="/aluno/dash">
-          <i className="fas fa-home"></i> INICIO
-        </a>
-        <a href="#" className="active">
-          <i className="fas fa-tasks"></i> ATIVIDADES
-        </a>
-        <a href="/aluno/avaliacoes">
-          <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
-        </a>
-        <a href="/aluno/avisos">
-          <i className="fas fa-bell"></i> AVISOS
-        </a>
-        <a href="/aluno/horario">
-          <i className="fa-solid fa-clock"></i> HORÁRIO
-        </a>
-        <a href="/aluno/notas">
-          <i className="fa-solid fa-note-sticky"></i>NOTAS
-        </a>
-        <a href="/">
-          <i className="fas fa-sign-out-alt"></i> SAIR
-        </a>
+        <a href="/aluno/dash" ><i className="fas fa-home"></i> INICIO</a>
+        <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/aluno/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/aluno/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/aluno/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/aluno/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/aluno/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
+        <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
       <div className="content">
         <div className="header">
           <div className="welcome">
-            Olá, <strong>{user ? user.nome || user.name : ""}</strong>
+            Olá, Bem-vindo <strong>{user.name}</strong>
           </div>
           <div className="icons">
-            <a href="/aluno/chat" className="active">
-              <i className="fas fa-envelope"></i>
-            </a>
+            <a href="/aluno/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user">
               <i className="fas fa-user-circle"></i>
             </div>
           </div>
         </div>
 
-        <h2>Atividades da Turma</h2>
+        {erro && <div className="error">{erro}</div>}
+        {mensagem && <div className="success">{mensagem}</div>}
 
+        {/* Lista de Atividades */}
         <div className="atividade-list">
-          {atividades.length === 0 ? (
-            <div className="sem-atividades">
-              Nenhuma atividade disponível no momento.
-            </div>
-          ) : (
+          <h2>Minhas Atividades</h2>
+
+          {loading ? (
+            <p>Carregando atividades...</p>
+          ) : atividades.length > 0 ? (
             atividades.map((atividade) => (
               <div key={atividade.id} className="atividade-item">
                 <h3>{atividade.titulo}</h3>
                 <p>{atividade.descricao}</p>
-                <p>
-                  Data Início:{" "}
-                  {new Date(atividade.dataInicio).toLocaleString()}
-                </p>
+                <p>Turma: {atividade.turmaIdt}</p>
+                <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
                 <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
 
-                {atividade.documento && (
-                  <a
-                    href={atividade.documento}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="download-button"
-                  >
-                    📂 Baixar Documento
-                  </a>
+                {atividade.documentoUrl && (
+                  <p>
+                    <a
+                      href={atividade.documentoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="document-link"
+                    >
+                      <i className="fas fa-file-download"></i> Baixar Documento
+                    </a>
+                  </p>
                 )}
               </div>
             ))
+          ) : (
+            <p>Nenhuma atividade encontrada para sua turma.</p>
           )}
         </div>
       </div>
@@ -134,4 +158,4 @@ function AlunoAtividades() {
   );
 }
 
-export default AlunoAtividades;
+export default AlunoActive;

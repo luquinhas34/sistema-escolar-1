@@ -41,6 +41,7 @@ import AlunoActive from "./pages/aluno/atividades"
 import AlunoAvali from "./pages/aluno/avaliacoes"
 import AlunoAviso from "./pages/aluno/avisos"
 import AlunoNotas from "./pages/aluno/notas"
+import AlunoFrequencia from "./pages/aluno/frequencia"
 import Alunohorario from "./pages/aluno/horario"
 // Aluno
 function App() {
@@ -84,6 +85,7 @@ function App() {
           <Route path="avaliacoes" element={<AlunoAvali />} />
           <Route path="avisos" element={<AlunoAviso />} />
           <Route path="horario" element={<Alunohorario />} />
+          <Route path="frequencia" element={<AlunoFrequencia />} />
           <Route path="/aluno/Notas" element={<AlunoNotas />} />
         </Route>
 

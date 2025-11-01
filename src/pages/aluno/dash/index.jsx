@@ -69,6 +69,7 @@ function Alunohome() {
         <a href="/aluno/avisos"><i className="fas fa-bell"></i> AVISOS</a>
         <a href="/aluno/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
         <a href="/aluno/notas"><i className="fa-solid fa-note-sticky"></i> NOTAS</a>
+        <a href="/aluno/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
 
