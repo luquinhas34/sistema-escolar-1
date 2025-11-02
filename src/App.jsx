@@ -44,6 +44,18 @@ import AlunoNotas from "./pages/aluno/notas"
 import AlunoFrequencia from "./pages/aluno/frequencia"
 import Alunohorario from "./pages/aluno/horario"
 // Aluno
+
+// Professor
+import Prof from "./pages/Prof/Prof.jsx";
+import ProfDash from "./pages/Prof/dash";
+import ProfActive from "./pages/Prof/atividades"
+import ProfAvali from "./pages/Prof/avaliacoes"
+import ProfAviso from "./pages/Prof/avisos"
+import ProfFrequencia from "./pages/Prof/frequencia"
+import ProfNotas from "./pages/Prof/notas"
+import Profhorario from "./pages/Prof/horario"
+
+// Professor
 function App() {
   return (
     <BrowserRouter>
@@ -91,7 +103,17 @@ function App() {
 
         <Route path="/Admin" element={<Admin />} />
 
-
+        {/* Prof */}
+        <Route path="/prof" element={<Prof />}>
+          <Route path="dash" element={<ProfDash />} />
+          <Route path="atividades" element={<ProfActive />} />
+          <Route path="avaliacoes" element={<ProfAvali />} />
+          <Route path="avisos" element={<ProfAviso />} />
+          <Route path="/prof/frequencia" element={<ProfFrequencia />} />
+          <Route path="/prof/Notas" element={<ProfNotas />} />
+          <Route path="horario" element={<Profhorario />} />
+        </Route>
+        {/* Prof */}
 
 
         <Route path="/admcadastro" element={<Admcadastro />} />

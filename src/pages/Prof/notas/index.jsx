@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../../services/api"; // Usando o 'api' que configuramos
 import "./style.css"; // Importando o CSS limpo
 
-export default function DiretNotas() {
+export default function ProfNotas() {
     // States dos Filtros
     const [turmas, setTurmas] = useState([]);
     const [materias, setMaterias] = useState([]);
@@ -201,16 +201,13 @@ export default function DiretNotas() {
             {/* SIDEBAR */}
             <div className="sidebar">
                 {/* ... (links da sidebar do diret) ... */}
-                <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
-                <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-                <a href="/diret/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-                <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-                <a href="/diret/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+                <a href="/Prof/dash"><i className="fas fa-home"></i> INICIO</a>
+                <a href="/Prof/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+                <a href="/Prof/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+                <a href="/Prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+                <a href="/Prof/horario"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
                 <a href="#" className="active"><i className="fa-solid fa-note-sticky"></i> NOTAS</a>
-                <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-                <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i> PROFESSOR</a>
-                <a href="/diret/aluno"><i className="fa-circle-user"></i> ALUNOS</a>
-                <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
+                <a href="/Prof/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
                 <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
             </div>
 
@@ -221,7 +218,7 @@ export default function DiretNotas() {
                         Olá, Bem-vindo <strong>{user.name}</strong>
                     </div>
                     <div className="icons">
-                        <a href="/cood/chat"><i className="fas fa-envelope"></i></a>
+                        <a href="/Prof/chat"><i className="fas fa-envelope"></i></a>
                         <div className="user"><i className="fas fa-user-circle"></i></div>
                     </div>
                 </div>

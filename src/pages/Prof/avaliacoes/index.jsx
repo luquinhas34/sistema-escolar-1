@@ -3,7 +3,7 @@ import api from "../../../services/api";
 import "../avaliacoes/style.css";
 
 
-function DiretAvaliacoes() {
+function ProfAvaliacoes() {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -230,16 +230,13 @@ function DiretAvaliacoes() {
   return (
     <div className="centro">
       <div className="sidebar">
-        <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
-        <a href="/diret/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/Prof/dash" ><i className="fas fa-home"></i> INICIO</a>
+        <a href="/Prof/atividades" ><i className="fas fa-tasks"></i> ATIVIDADES</a>
         <a href="#" className="active"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-        <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-        <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
-        <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
-        <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
-        <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
+        <a href="/Prof/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/Prof/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/Prof/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/Prof/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
         <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
       <div className="content">
@@ -248,7 +245,7 @@ function DiretAvaliacoes() {
             Olá, Bem-vindo <strong>Carlos Pereira</strong>
           </div>
           <div className="icons">
-            <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>
+            <a href="/Prof/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user">
               <i className="fas fa-user-circle"></i>
             </div>
@@ -390,4 +387,4 @@ function DiretAvaliacoes() {
   );
 }
 
-export default DiretAvaliacoes;
+export default ProfAvaliacoes;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-import { useNavigate } from "react-router-dom";
 import "../atividades/style.css";
+
 
 function DiretActive() {
   const [formData, setFormData] = useState({
@@ -9,10 +9,11 @@ function DiretActive() {
     descricao: "",
     dataInicio: "",
     dataFim: "",
-    turmaIdt: 0,
-    userId: 0,
+    turmaIdt: 0,   // ou null, mas zero para indicar "não selecionado"
+    userId: 0,     // preenchido depois do useEffect
     documento: null,
   });
+
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [atividades, setAtividades] = useState([]);
@@ -21,10 +22,9 @@ function DiretActive() {
   const [erro, setErro] = useState("");
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false);
   const [idParaExcluir, setIdParaExcluir] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({ name: "Usuário" });
   const [turmas, setTurmas] = useState([]);
   const [selectedTurma, setSelectedTurma] = useState("");
-  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,7 +40,9 @@ function DiretActive() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Dados a serem enviados:", formData);
 
+    // Verificações adicionais
     const turmaIdtNum = Number(formData.turmaIdt);
     const userIdNum = Number(formData.userId);
 
@@ -57,6 +59,7 @@ function DiretActive() {
     }
 
     const data = new FormData();
+
     data.append("titulo", formData.titulo);
     data.append("descricao", formData.descricao);
     data.append("dataInicio", formData.dataInicio);
@@ -70,6 +73,7 @@ function DiretActive() {
 
     try {
       const token = localStorage.getItem("token");
+
       const response = await api.post("/api/atividades", data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -101,6 +105,8 @@ function DiretActive() {
     }
   };
 
+
+  // Renomeada para manter consistência
   const buscarAtividades = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -111,20 +117,18 @@ function DiretActive() {
       });
       setAtividades(response.data);
     } catch (error) {
-      console.error("Erro ao buscar atividades:", error);
-      console.log("Resposta do servidor:", error.response?.data);
+      console.error('Erro ao criar avaliação:', error);
+      console.log('Resposta do servidor:', error.response?.data);
     }
   };
 
   const handleEditaratividades = (atividade) => {
-    const dataInicio = atividade.dataInicio
-      ? new Date(atividade.dataInicio).toISOString().slice(0, 16)
-      : "";
-    const dataFim = atividade.dataFim
-      ? new Date(atividade.dataFim).toISOString().slice(0, 16)
-      : "";
+    // Formatando as datas para o formato esperado pelo input datetime-local
+    const dataInicio = atividade.dataInicio ? new Date(atividade.dataInicio).toISOString().slice(0, 16) : "";
+    const dataFim = atividade.dataFim ? new Date(atividade.dataFim).toISOString().slice(0, 16) : "";
 
-    const turmaSelecionada = turmas.find((t) => t.nome === atividade.turmaIdt);
+    // Procurar a turma pelo nome que está em atividade.turmaIdt
+    const turmaSelecionada = turmas.find(t => t.nome === atividade.turmaIdt);
     const turmaIdtNumerico = turmaSelecionada ? turmaSelecionada.id : "";
 
     setFormData({
@@ -138,6 +142,7 @@ function DiretActive() {
     setMostrarFormulario(true);
   };
 
+
   const handleRemoveratividades = (id) => {
     setIdParaExcluir(id);
     setMostrarModalExcluir(true);
@@ -147,7 +152,9 @@ function DiretActive() {
     try {
       const token = localStorage.getItem("token");
       await api.delete(`/api/atividades/${idParaExcluir}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setMensagem("Avaliação excluída com sucesso!");
       setErro("");
@@ -166,17 +173,6 @@ function DiretActive() {
     setIdParaExcluir(null);
   };
 
-  const handleTurmaChange = (e) => {
-    const value = e.target.value;
-    setSelectedTurma(value);
-    const turmaIdConvertido =
-      value !== "" && !isNaN(Number(value)) ? Number(value) : "";
-    setFormData((prev) => ({
-      ...prev,
-      turmaIdt: turmaIdConvertido,
-    }));
-  };
-
   useEffect(() => {
     const buscarTurmas = async () => {
       try {
@@ -190,20 +186,16 @@ function DiretActive() {
       }
     };
 
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-    if (!token || !storedUser) {
-      navigate("/");
-      return;
+    const userFromStorage = JSON.parse(localStorage.getItem("user"));
+    if (userFromStorage) {
+      setUser(userFromStorage);
+      // Definir o ID do usuário no formulário automaticamente
+      setFormData(prev => ({ ...prev, userId: userFromStorage.id }));
     }
-
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
-    setFormData((prev) => ({ ...prev, userId: parsedUser.id }));
 
     buscarTurmas();
     buscarAtividades();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (mensagem || erro) {
@@ -211,57 +203,51 @@ function DiretActive() {
         setMensagem("");
         setErro("");
       }, 10000);
+
       return () => clearTimeout(timer);
     }
   }, [mensagem, erro]);
 
+  const handleTurmaChange = (e) => {
+    const value = e.target.value;
+
+    setSelectedTurma(value);
+
+    // Aqui garantimos que apenas valores numéricos válidos sejam aplicados
+    const turmaIdConvertido = value !== "" && !isNaN(Number(value)) ? Number(value) : "";
+
+    setFormData((prev) => ({
+      ...prev,
+      turmaIdt: turmaIdConvertido,
+    }));
+  };
+
+
+
+
+
   return (
     <div className="centro">
       <div className="sidebar">
-        <a href="/diret/dash">
-          <i className="fas fa-home"></i> INICIO
-        </a>
-        <a href="#" className="active">
-          <i className="fas fa-tasks"></i> ATIVIDADES
-        </a>
-        <a href="/diret/avaliacoes">
-          <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
-        </a>
-        <a href="/diret/avisos">
-          <i className="fas fa-bell"></i> AVISOS
-        </a>
-        <a href="/diret/horario">
-          <i className="fa-solid fa-clock"></i> HORÁRIO
-        </a>
-        <a href="/diret/notas">
-          <i className="fa-solid fa-note-sticky"></i>NOTAS
-        </a>
-        <a href="/diret/frequencia">
-          <i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA
-        </a>
-        <a href="/diret/professor">
-          <i className="fa-solid fa-person-chalkboard"></i>PROFESSOR
-        </a>
-        <a href="/diret/aluno">
-          <i className="fa-circle-user"></i>ALUNOS
-        </a>
-        <a href="/diret/turmas">
-          <i className="fa-circle-user"></i> TURMAS
-        </a>
-        <a href="/">
-          <i className="fas fa-sign-out-alt"></i> SAIR
-        </a>
+        <a href="/diret/dash" ><i className="fas fa-home"></i> INICIO</a>
+        <a href="#" className="active"><i className="fas fa-tasks"></i> ATIVIDADES</a>
+        <a href="/diret/avaliacoes" ><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
+        <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
+        <a href="/diret/horario" ><i className="fa-solid fa-clock"></i> HORÁRIO</a>
+        <a href="/diret/notas" ><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
+        <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
+        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard" ></i>PROFESSOR</a>
+        <a href="/diret/aluno" ><i className="fa-circle-user" ></i>ALUNOS</a>
+        <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
+        <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
       </div>
-
       <div className="content">
         <div className="header">
           <div className="welcome">
-            Olá, Bem-vindo <strong>{user ? user.nome || user.name : ""}</strong>
+            Olá, Bem-vindo <strong>Carlos Pereira</strong>
           </div>
           <div className="icons">
-            <a href="/diret/chat" className="active">
-              <i className="fas fa-envelope"></i>
-            </a>
+            <a href="/diret/chat" className="active"><i className="fas fa-envelope"></i></a>
             <div className="user">
               <i className="fas fa-user-circle"></i>
             </div>
@@ -278,6 +264,7 @@ function DiretActive() {
               }
               setMostrarFormulario(!mostrarFormulario);
               if (mostrarFormulario) {
+                // Resetar o formulário quando fechar
                 setFormData({
                   titulo: "",
                   descricao: "",
@@ -291,19 +278,13 @@ function DiretActive() {
               }
             }}
           >
-            {atividadesParaEditar
-              ? "Cancelar Edição"
-              : mostrarFormulario
-                ? "Cancelar"
-                : "Adicionar Avaliação"}
+            {atividadesParaEditar ? "Cancelar Edição" : mostrarFormulario ? "Cancelar" : "Adicionar Avaliação"}
           </button>
         </div>
 
         {mostrarFormulario && (
           <form onSubmit={handleSubmit}>
-            <label>
-              Título <span style={{ color: "red" }}>*</span>
-            </label>
+            <label>Título <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               name="titulo"
@@ -312,9 +293,7 @@ function DiretActive() {
               required
             />
 
-            <label>
-              Descrição <span style={{ color: "red" }}>*</span>
-            </label>
+            <label>Descrição <span style={{ color: "red" }}>*</span></label>
             <textarea
               name="descricao"
               value={formData.descricao}
@@ -333,13 +312,12 @@ function DiretActive() {
                   <option key={turma.idt} value={turma.idt}>
                     {turma.nome}
                   </option>
+
                 ))}
               </select>
             </label>
 
-            <label>
-              Data Início <span style={{ color: "red" }}>*</span>
-            </label>
+            <label>Data Início <span style={{ color: "red" }}>*</span></label>
             <input
               type="datetime-local"
               name="dataInicio"
@@ -347,9 +325,7 @@ function DiretActive() {
               onChange={handleInputChange}
               required
             />
-            <label>
-              Data Fim <span style={{ color: "red" }}>*</span>
-            </label>
+            <label>Data Fim <span style={{ color: "red" }}>*</span></label>
             <input
               type="datetime-local"
               name="dataFim"
@@ -358,10 +334,12 @@ function DiretActive() {
               required
             />
             <label>Documento</label>
-            <input type="file" name="documento" onChange={handleFileChange} />
-            <label>
-              Seu ID <span style={{ color: "red" }}>*</span>
-            </label>
+            <input
+              type="file"
+              name="documento"
+              onChange={handleFileChange}
+            />
+            <label>Seu ID <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               name="userId"
@@ -371,9 +349,7 @@ function DiretActive() {
               readOnly={user?.id ? true : false}
             />
 
-            <button type="submit">
-              {atividadesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}
-            </button>
+            <button type="submit">{atividadesParaEditar ? "Editar Avaliação" : "Criar Avaliação"}</button>
           </form>
         )}
 
@@ -386,17 +362,10 @@ function DiretActive() {
               <h3>{atividade.titulo}</h3>
               <p>{atividade.descricao}</p>
               <p>Turma ID: {atividade.turmaIdt}</p>
-              <p>
-                Data Início:{" "}
-                {new Date(atividade.dataInicio).toLocaleString()}
-              </p>
+              <p>Data Início: {new Date(atividade.dataInicio).toLocaleString()}</p>
               <p>Data Fim: {new Date(atividade.dataFim).toLocaleString()}</p>
-              <button onClick={() => handleEditaratividades(atividade)}>
-                Editar
-              </button>
-              <button onClick={() => handleRemoveratividades(atividade.id)}>
-                Excluir
-              </button>
+              <button onClick={() => handleEditaratividades(atividade)}>Editar</button>
+              <button onClick={() => handleRemoveratividades(atividade.id)}>Excluir</button>
             </div>
           ))}
         </div>

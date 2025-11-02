@@ -2,174 +2,196 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "../horario/style.css";
 
-// 🔹 Helper para pegar usuário do localStorage
-function getStoredUser() {
-  try {
-    const raw = localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-export default function Horario() {
-  const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+export default function AdicionarHorarios() {
   const turnos = [
     { value: "manha", label: "Manhã" },
     { value: "tarde", label: "Tarde" },
     { value: "noite", label: "Noite" },
     { value: "integral", label: "Integral" },
   ];
-  const turmaId = 1; // ✅ nome correto
 
-  const [diaSelecionado, setDiaSelecionado] = useState("Segunda");
+  const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+
+  const [turmas, setTurmas] = useState([]);
+  const [materias, setMaterias] = useState([]);
+
   const [turnoSelecionado, setTurnoSelecionado] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [modoEdicao, setModoEdicao] = useState(false);
-  const [tituloHorario, setTituloHorario] = useState("");
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFim, setHoraFim] = useState("");
-  const [diaModal, setDiaModal] = useState("Segunda");
-  const [turnoModal, setTurnoModal] = useState("manhã");
-  const [horarios, setHorarios] = useState([]);
-  const [horarioSelecionado, setHorarioSelecionado] = useState(null);
+  const [diaSelecionado, setDiaSelecionado] = useState("");
+  const [turmaSelecionada, setTurmaSelecionada] = useState("");
 
-  // 🔹 Pega usuário logado
-  const user = getStoredUser();
-  const nomeUsuario = user?.nome || user?.name || "Usuário";
+  const [aulas, setAulas] = useState([]);
+  const [loadingTurmas, setLoadingTurmas] = useState(true);
+  const [loadingMaterias, setLoadingMaterias] = useState(true);
 
+  // Carrega turmas e matérias do backend
   useEffect(() => {
-    async function carregarHorarios() {
+    async function carregarDados() {
       try {
-        const res = await axios.get(`http://localhost:3000/api/horarios/${turmaId}`);
-        setHorarios(res.data);
-      } catch (err) {
-        console.error("Erro ao carregar horários:", err);
-      }
-    }
-    carregarHorarios();
-  }, [turmaId]);
+        const resTurmas = await axios.get("http://localhost:3000/api/turmas");
+        console.log("Resposta turmas:", resTurmas.data);
+        setTurmas(resTurmas.data || []);
+        setLoadingTurmas(false);
 
-  function limparFormulario() {
-    setTituloHorario("");
-    setHoraInicio("");
-    setHoraFim("");
-    setDiaModal(diaSelecionado);
-    setTurnoModal(turnoSelecionado || "manhã");
-    setHorarioSelecionado(null);
-  }
-
-  async function handleSalvarHorario() {
-    if (!diaModal || !turnoModal || !tituloHorario || !horaInicio || !horaFim) {
-      alert("Por favor, preencha todos os campos.");
-      return;
-    }
-
-    const novoHorario = {
-      dia: diaModal,
-      turno: turnoModal,
-      atividade: tituloHorario,
-      horaInicio,
-      horaFim,
-      turmaId,
-    };
-
-    try {
-      if (modoEdicao && horarioSelecionado) {
-        await axios.put(
-          `http://localhost:3000/api/horarios/${horarioSelecionado.id}`,
-          novoHorario
+        const resMaterias = await axios.get(
+          "http://localhost:3000/api/materia/listar"
         );
-      } else {
-        await axios.post("http://localhost:3000/api/horarios", novoHorario);
+        console.log("Resposta matérias:", resMaterias.data);
+
+        console.log("Resposta matérias:", resMaterias.data);
+        setMaterias(resMaterias.data || []);
+        setLoadingMaterias(false);
+      } catch (err) {
+        console.error("Erro ao carregar turmas ou matérias:", err);
+        setLoadingTurmas(false);
+        setLoadingMaterias(false);
       }
-      const res = await axios.get(`http://localhost:3000/api/horarios/${turmaId}`);
-      setHorarios(res.data);
-      limparFormulario();
-      setShowModal(false);
-      setModoEdicao(false);
-    } catch (err) {
-      console.error("Erro ao salvar horário:", err);
-      alert("Erro ao salvar horário. Veja o console.");
     }
+    carregarDados();
+  }, []);
+
+  // Inicializa as 9 aulas quando turno, dia e turma são selecionados
+  useEffect(() => {
+    if (turnoSelecionado && diaSelecionado && turmaSelecionada && materias.length) {
+      const horariosPadrao = [
+        ["07:30", "08:20"],
+        ["08:20", "09:10"],
+        ["09:10", "10:00"],
+        ["10:20", "11:10"],
+        ["11:10", "12:00"],
+        ["12:30", "13:20"],
+        ["13:20", "14:10"],
+        ["14:10", "15:00"],
+        ["15:20", "16:10"],
+      ];
+
+      const aulasInicial = horariosPadrao.map(([inicio, fim], index) => ({
+        id: index,
+        horaInicio: inicio,
+        horaFim: fim,
+        materiaId: materias[0]?.id?.toString() || "",
+      }));
+
+      setAulas(aulasInicial);
+    } else {
+      setAulas([]);
+    }
+  }, [turnoSelecionado, diaSelecionado, turmaSelecionada, materias]);
+
+  function handleMateriaChange(id, materiaId) {
+    setAulas((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, materiaId } : a))
+    );
   }
 
-  async function handleAdicionarOutro() {
-    if (!diaModal || !turnoModal || !tituloHorario || !horaInicio || !horaFim) {
-      alert("Por favor, preencha todos os campos.");
+  async function handleSalvarTodos() {
+    if (!turnoSelecionado || !diaSelecionado || !turmaSelecionada) {
+      alert("Selecione turno, dia e turma.");
       return;
     }
 
-    const novoHorario = {
-      dia: diaModal,
-      turno: turnoModal,
-      atividade: tituloHorario,
-      horaInicio,
-      horaFim,
-      turmaId,
-    };
+    const turmaIdNumber = Number(turmaSelecionada);
+    if (isNaN(turmaIdNumber)) {
+      alert("Turma inválida. Selecione uma turma válida.");
+      return;
+    }
+
+    const payload = aulas
+      .filter(
+        (a) =>
+          a.materiaId &&
+          !isNaN(Number(a.materiaId)) &&
+          turmaSelecionada &&
+          !isNaN(Number(turmaSelecionada))
+      )
+      .map((a) => ({
+        dia: diaSelecionado,
+        turno: turnoSelecionado,
+        horaInicio: a.horaInicio,
+        horaFim: a.horaFim,
+        turmaId: turmaIdNumber,
+        materiaId: Number(a.materiaId),
+      }));
+
+    if (payload.length === 0) {
+      alert("Selecione pelo menos uma aula com matéria válida.");
+      return;
+    }
 
     try {
-      await axios.post("http://localhost:3000/api/horarios", novoHorario);
-      const res = await axios.get(`http://localhost:3000/api/horarios/${turmaId}`);
-      setHorarios(res.data);
-      limparFormulario();
+      console.log("Payload enviado:", payload);
+
+      await axios.post("http://localhost:3000/api/horario/multiplos", payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      alert("Horários adicionados com sucesso!");
+
+      setTurnoSelecionado("");
+      setDiaSelecionado("");
+      setTurmaSelecionada("");
+      setAulas([]);
     } catch (err) {
-      console.error("Erro ao adicionar horário:", err);
-      alert("Erro ao adicionar horário. Veja o console.");
+      console.error("Erro ao salvar horários:", err);
+      alert("Erro ao salvar horários. Veja o console.");
     }
   }
-
-  async function handleExcluir(id) {
-    if (!window.confirm("Deseja realmente excluir este horário?")) return;
-
-    try {
-      await axios.delete(`http://localhost:3000/api/horarios/${id}`);
-      setHorarios((prev) => prev.filter((h) => h.id !== id));
-    } catch (err) {
-      console.error("Erro ao excluir horário:", err);
-      alert("Erro ao excluir horário. Veja o console.");
-    }
-  }
-
-  const horariosFiltrados = turnoSelecionado
-    ? horarios.filter((h) => h.dia === diaSelecionado && h.turno === turnoSelecionado)
-    : [];
 
   return (
     <div className="centro">
-      {/* --- Sidebar --- */}
       <div className="sidebar">
-        <a href="/diret/dash"><i className="fas fa-home"></i> INICIO</a>
-        <a href="/diret/atividades"><i className="fas fa-tasks"></i> ATIVIDADES</a>
-        <a href="/diret/avaliacoes"><i className="fas fa-clipboard-check"></i> AVALIAÇÕES</a>
-        <a href="/diret/avisos"><i className="fas fa-bell"></i> AVISOS</a>
-        <a href="#" className="active"><i className="fa-solid fa-clock"></i> HORÁRIO</a>
-        <a href="/diret/notas"><i className="fa-solid fa-note-sticky"></i>NOTAS</a>
-        <a href="/diret/frequencia"><i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA</a>
-        <a href="/diret/professor"><i className="fa-solid fa-person-chalkboard"></i>PROFESSOR</a>
-        <a href="/diret/aluno"><i className="fa-circle-user"></i> ALUNOS</a>
-        <a href="/diret/turmas"><i className="fa-circle-user"></i> TURMAS</a>
-        <a href="/"><i className="fas fa-sign-out-alt"></i> SAIR</a>
+        <a href="/diret/dash">
+          <i className="fas fa-home"></i> INICIO
+        </a>
+        <a href="/diret/atividades">
+          <i className="fas fa-tasks"></i> ATIVIDADES
+        </a>
+        <a href="/diret/avaliacoes">
+          <i className="fas fa-clipboard-check"></i> AVALIAÇÕES
+        </a>
+        <a href="/diret/avisos">
+          <i className="fas fa-bell"></i> AVISOS
+        </a>
+        <a href="#" className="active">
+          <i className="fa-solid fa-clock"></i> HORÁRIO
+        </a>
+        <a href="/diret/notas">
+          <i className="fa-solid fa-note-sticky"></i> NOTAS
+        </a>
+        <a href="/diret/frequencia">
+          <i className="fa-solid fa-calendar-days"></i> FREQUÊNCIA
+        </a>
+        <a href="/diret/professor">
+          <i className="fa-solid fa-person-chalkboard"></i> PROFESSOR
+        </a>
+        <a href="/diret/aluno">
+          <i className="fa-circle-user"></i> ALUNOS
+        </a>
+        <a href="/diret/turmas">
+          <i className="fa-circle-user"></i> TURMAS
+        </a>
+        <a href="/">
+          <i className="fas fa-sign-out-alt"></i> SAIR
+        </a>
       </div>
 
-      {/* --- Conteúdo --- */}
       <div className="content">
         <div className="header">
-          {/* 🔹 Igual ao CadastroAluno */}
           <div className="welcome">
-            Olá, Bem-vindo <strong>{nomeUsuario}</strong>
+            Olá, Bem-vindo <strong>Carlos Pereira</strong>
           </div>
           <div className="icons">
-            <a href="/cood/chat"><i className="fas fa-envelope"></i></a>
-            <div className="user"><i className="fas fa-user-circle"></i></div>
+            <a href="/diret/chat">
+              <i className="fas fa-envelope"></i>
+            </a>
+            <div className="user">
+              <i className="fas fa-user-circle"></i>
+            </div>
           </div>
         </div>
 
         <div className="horario-section">
-          <h2>Horários</h2>
+          <h2>Adicionar Horários do Dia</h2>
 
-          {/* --- Barra superior --- */}
           <div className="horario-top-bar">
             <select
               value={turnoSelecionado}
@@ -177,153 +199,76 @@ export default function Horario() {
             >
               <option value="">Selecione o turno</option>
               {turnos.map((t) => (
-                <option key={t.value} value={t.value}>
+                <option key={`turno-${t.value}`} value={t.value}>
                   {t.label}
                 </option>
               ))}
             </select>
 
-            <button
-              className="btn-editar"
-              disabled={!turnoSelecionado}
-              onClick={() => {
-                const primeiro = horarios.find(
-                  (h) => h.dia === diaSelecionado && h.turno === turnoSelecionado
-                );
-                if (primeiro) {
-                  setModoEdicao(true);
-                  setTituloHorario(primeiro.atividade);
-                  setHoraInicio(primeiro.horaInicio);
-                  setHoraFim(primeiro.horaFim);
-                  setDiaModal(primeiro.dia);
-                  setTurnoModal(primeiro.turno);
-                  setHorarioSelecionado(primeiro);
-                  setShowModal(true);
-                } else {
-                  alert("Nenhum horário encontrado para editar neste dia e turno.");
-                }
-              }}
+            <select
+              value={diaSelecionado}
+              onChange={(e) => setDiaSelecionado(e.target.value)}
             >
-              <i className="fas fa-pen"></i> Editar
-            </button>
-
-            <button
-              className="btn-adicionar"
-              onClick={() => {
-                setModoEdicao(false);
-                limparFormulario();
-                setShowModal(true);
-              }}
-            >
-              <i className="fas fa-plus"></i> Adicionar horário
-            </button>
-          </div>
-
-          {/* --- Dias da semana --- */}
-          <div className="dias-semana">
-            {dias.map((dia) => (
-              <button
-                key={dia}
-                className={`dia-btn ${diaSelecionado === dia ? "ativo" : ""}`}
-                onClick={() => setDiaSelecionado(dia)}
-              >
-                {dia}
-              </button>
-            ))}
-          </div>
-
-          {/* --- Tabela de horários --- */}
-          <div className="horario-tabela">
-            {turnoSelecionado === "" && (
-              <p className="info-msg">Selecione um turno para exibir os horários.</p>
-            )}
-            {horariosFiltrados.length === 0 && turnoSelecionado !== "" && (
-              <p className="info-msg">Nenhum horário cadastrado para este dia e turno.</p>
-            )}
-            {horariosFiltrados.map((h) => (
-              <div className="linha-horario" key={h.id}>
-                <span>{h.atividade}</span>
-                <span>
-                  {h.horaInicio} até {h.horaFim}
-                </span>
-                <button
-                  onClick={() => handleExcluir(h.id)}
-                  className="btn-excluir"
-                  title="Excluir horário"
-                >
-                  Excluir
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* --- Modal --- */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>{modoEdicao ? "Editar Horário" : "Adicionar Horário"}</h3>
-
-            <input
-              type="text"
-              placeholder="Título do Horário"
-              value={tituloHorario}
-              onChange={(e) => setTituloHorario(e.target.value)}
-            />
-
-            <label>Início:</label>
-            <input
-              type="time"
-              value={horaInicio}
-              onChange={(e) => setHoraInicio(e.target.value)}
-            />
-
-            <label>Término:</label>
-            <input
-              type="time"
-              value={horaFim}
-              onChange={(e) => setHoraFim(e.target.value)}
-            />
-
-            <label>Dia da Semana:</label>
-            <select value={diaModal} onChange={(e) => setDiaModal(e.target.value)}>
-              {dias.map((dia) => (
-                <option key={dia} value={dia}>
-                  {dia}
+              <option value="">Selecione o dia</option>
+              {dias.map((d) => (
+                <option key={`dia-${d}`} value={d}>
+                  {d}
                 </option>
               ))}
             </select>
 
-            <label>Turno:</label>
-            <select value={turnoModal} onChange={(e) => setTurnoModal(e.target.value)}>
-              {turnos.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
+            <select
+              value={turmaSelecionada}
+              onChange={(e) => setTurmaSelecionada(e.target.value)}
+            >
+              <option value="">
+                {loadingTurmas ? "Carregando turmas..." : "Selecione a turma"}
+              </option>
+              {turmas.map((t) => (
+                <option key={t.idt} value={t.idt.toString()}>
+                  {t.nome}
                 </option>
               ))}
             </select>
+          </div>
 
-            <div className="botoes-modal">
-              <button onClick={handleSalvarHorario}>
-                {modoEdicao ? "Salvar Alterações" : "Salvar"}
-              </button>
-              {!modoEdicao && (
-                <button onClick={handleAdicionarOutro}>Adicionar Outro</button>
-              )}
+          {aulas.length > 0 && (
+            <div className="horario-tabela">
+              {aulas.map((a) => (
+                <div className="linha-horario" key={`linha-${a.id}`}>
+                  <span className="horario-hora">
+                    {a.horaInicio} - {a.horaFim}
+                  </span>
+                  <select
+                    value={a.materiaId || ""}
+                    onChange={(e) => handleMateriaChange(a.id, e.target.value)}
+                    className="horario-materia"
+                  >
+                    <option value="">
+                      {loadingMaterias
+                        ? "Carregando matérias..."
+                        : "Selecione a matéria"}
+                    </option>
+                    {materias.map((m) => (
+                      <option key={m.id} value={m.id.toString()}>
+                        {m.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
               <button
-                onClick={() => {
-                  setShowModal(false);
-                  setModoEdicao(false);
-                  limparFormulario();
-                }}
+                onClick={handleSalvarTodos}
+                className="btn-adicionar"
+                style={{ marginTop: "20px" }}
               >
-                Cancelar
+                Salvar Todos
               </button>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
+
